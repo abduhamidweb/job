@@ -1,1 +1,1 @@
-# Web application of the Essential English words Uzbek translations
+# Web application of the Job apply
