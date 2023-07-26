@@ -57,7 +57,7 @@ const FileDataSchema = new Schema<IFileData>({
     moreInfo:[ {
         type: Schema.Types.ObjectId,
         ref: 'MoreInfo', 
-    }],
+    }], 
     catId: {
         type: String,
         required: true,
