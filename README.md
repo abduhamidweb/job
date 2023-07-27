@@ -29,6 +29,6 @@ MONGODB_URI= YOUR MONGODB_URL
 ## Contributing:
 ### If you want to contribute to our project, please contact us through "A" section of the project. If you provide assistance, we will add you to the list of contributors and include your work in your portfolio.
 ## Project Status:
-### The project is actively being worked on, with monthly updates and new features added. If you have any additional ideas regarding our project, feel free to share them on <a href="t.me/AbduhamidBotirov">Abduhamid Botirov</a>.
+### The project is actively being worked on, with monthly updates and new features added. If you have any additional ideas regarding our project, feel free to share them on <a href="https://t.me/AbduhamidBotirov">Abduhamid Botirov</a>.
 ## Acknowledgments:
 ### If you contribute to the project, we will provide both A and B support in return.
