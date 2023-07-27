@@ -34,7 +34,7 @@ class FileDataController {
     // Barcha FileData obyektlarini olish
     async getAllFileData(req: Request, res: Response) {
         try {
-            const fileDataList = await FileDataModel.find().populate('jobSkills jobEmployee moreInfo moneyTypeId');
+            const fileDataList = await FileDataModel.find().populate('jobSkills jobEmployee moneyTypeId');
             return res.status(200).json(fileDataList);
         } catch (error:any) {
             console.error( error.message);

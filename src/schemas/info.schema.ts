@@ -17,4 +17,4 @@ const infoSchema = new Schema(
 );
 
 type info = InferSchemaType<typeof infoSchema>;
-export default model<info>("Info", infoSchema);
+export default model<info>("MoreInfo", infoSchema);

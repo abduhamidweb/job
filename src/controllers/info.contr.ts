@@ -1,8 +1,10 @@
+import { IFileData } from "../interface/interface.js";
 import infoSchema from "../schemas/info.schema.js";
 import { Request, Response } from "express";
+import FileDataModel from "../schemas/job.schema.js";
 
 export class InfoContr {
-  constructor() {}
+  constructor() { }
   static async getInfo(req: Request, res: Response) {
     try {
       const { id } = req.params;
@@ -39,6 +41,17 @@ export class InfoContr {
       }
 
       const newInfo = await infoSchema.create({ jobText, job_id });
+      if (job_id) {
+        const job: IFileData | null = await FileDataModel.findById(job_id);
+        if (job) {
+          job.moreInfo.push(newInfo._id);
+          await job.save();
+        } else {
+          const errorMessage = 'Job kategoriyasi topilmadi';
+          console.error(errorMessage);
+          return res.status(404).json({ message: errorMessage, status: 404 });
+        }
+      }
       await newInfo.save();
       res.send({
         status: 200,

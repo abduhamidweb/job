@@ -1,4 +1,6 @@
-import typeOfMoneySchema from "../schemas/money.schema.js";
+import { IFileData } from "../interface/interface.js";
+import FileDataModel from "../schemas/job.schema.js";
+import typeOfMoneySchema  from "../schemas/money.schema.js";
 import { Request, Response } from "express";
 
 export class moneyContr {
@@ -37,8 +39,19 @@ export class moneyContr {
       if (!moneyType || !job_id) {
         throw new Error(`Data is incompleted!`);
       }
-
       const newType = await typeOfMoneySchema.create({ moneyType, job_id });
+      if (job_id) {
+        // const jobCategory: IJobCategory | null = await JobCategoryModel.findById(catId);
+        const job: IFileData | null = await FileDataModel.findById(job_id);
+        if (job) {
+          job.moneyTypeId = newType._id
+          await job.save();
+        } else {
+          const errorMessage = 'Job kategoriyasi topilmadi';
+          console.error(errorMessage);
+          return res.status(404).json({ message: errorMessage, status: 404 });
+        }
+      }
       await newType.save();
       res.send({
         status: 200,
