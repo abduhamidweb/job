@@ -3,7 +3,7 @@ import { Schema, model, Types, InferSchemaType } from "mongoose";
 const infoSchema = new Schema(
   {
    jobText : {
-    type : Text,
+    type : String,
     required : [true, 'Job info is required']
    },
    job_id : {
