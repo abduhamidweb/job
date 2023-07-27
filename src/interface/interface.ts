@@ -5,8 +5,7 @@ export interface IPost extends Document {
     content: string;
     user: mongoose.Types.ObjectId;
 }
-export // Berilgan fayldagi ma'lumotlar uchun schema interfeysi
-    interface IFileData extends Document {
+export  interface IFileData extends Document {
     comImg: string;
     comName: string;
     comLocation: string;
@@ -21,4 +20,10 @@ export // Berilgan fayldagi ma'lumotlar uchun schema interfeysi
     moreInfo: Types.ObjectId[]; // ObjectId uchun ref
     catId: string;
     moneyTypeId: Types.ObjectId; // ObjectId uchun ref
+}
+export interface IJobCategory extends Document {
+    jobName: string;
+    jobImg: string;
+    jobDesc: string;
+    jobs: Types.Array<Types.ObjectId> | IFileData[];
 }

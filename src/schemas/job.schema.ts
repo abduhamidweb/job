@@ -60,6 +60,7 @@ const FileDataSchema = new Schema<IFileData>({
     }], 
     catId: {
         type: String,
+        ref:"JobCategory",
         required: true,
     },
     moneyTypeId: {
