@@ -1,8 +1,4 @@
 # Job apply
-##
-After completing these settings, it will work on Port `http://localhost:5000/api`
-
-
 ## Project Name and Description: Job Apply - Convenient Job Search Tool for Job Seekers
 ### This project is created to alleviate the difficulties of job searching for job seekers. It provides additional support for job seekers who are struggling to find suitable jobs.
 ## Project Objective:
@@ -13,6 +9,10 @@ npm i
 ```
 ```sh
 npm run dev
+```
+### After completing these settings, it will work on Port 
+```sh
+`http://localhost:5000/api`
 ```
 ## Usage Guide: 
 ### `.env`  File: For utilizing the application, you need to create an env file and add the following settings:
