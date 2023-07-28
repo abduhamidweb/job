@@ -1,27 +1,27 @@
 import nodemailer from "nodemailer";
 import { generateCode } from "./generateCode.js";
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: 'codecraftersteeam@gmail.com',
-        pass: 'fglqrzgyvdqfibfd'
-    }
+  service: "gmail",
+  auth: {
+    user: "mrvaliyev2006@gmail.com",
+    pass: process.env.EMAILPASSKEY,
+  },
 });
 // Elektron pochta yuborish funksiyasi
 export const sendConfirmationEmail = async (userEmail: string) => {
     const confirmationCode = generateCode(); // Tasdiqlash kodi generatsiyalansin
     const mailOptions = {
-        from: 'codecraftersteeam@gmail.com',
-        to: userEmail,
-        subject: 'Hi!',
-        html: `<h1>
+      from: "mrvaliyev2006@gmail.com",
+      to: userEmail,
+      subject: "Hi!",
+      html: `<h1>
       Your password <br/>
      ${confirmationCode}
-    </h1>`
+    </h1>`,
     };
     try {
         const result = await transporter.sendMail(mailOptions);
-        console.log('Email sent: ' + result.response);
+        
 
         return confirmationCode; // Tasdiqlash kodi qaytariladi
 
