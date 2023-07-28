@@ -14,12 +14,11 @@ const EmployeeSchema = new Schema<IEmployee>({
         type: String,
         required: true,
     },
-    jobId: [
-        {
-            type: Schema.Types.ObjectId,
-            ref: "FileData",
-        },
-    ],
+    jobId:
+    {
+        type: Schema.Types.ObjectId,
+        ref: "FileData",
+    },
 });
 
 const Employees = model<IEmployee>("Employee", EmployeeSchema);
