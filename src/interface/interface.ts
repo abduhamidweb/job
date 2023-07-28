@@ -27,3 +27,16 @@ export interface IJobCategory extends Document {
     jobDesc: string;
     jobs: Types.Array<Types.ObjectId> | IFileData[];
 }
+export interface ComLocationData {
+    _id: string;
+    comLocation: string;
+}
+export interface FileData {
+    _id: string;
+    comName: string;
+    comLocation: string;
+    jobTitle: string;
+    jobSkills: string[];
+    jobPrice: number;
+    location: string;
+}
