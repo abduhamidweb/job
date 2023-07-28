@@ -1,6 +1,10 @@
 import { Request, Response } from 'express';
 import { IJobCategory } from '../interface/interface.js';
 import JobCategoryModel from '../schemas/jobCategory.schema.js';
+import Skills from '../schemas/jobSkill.schema.js';
+import Employees from '../schemas/employee.schema.js'; 
+import moreInfo from '../schemas/info.schema.js';
+import moneyType from '../schemas/money.schema.js'; 
 
 class JobCategoryController {
     // Job kategoriyasi yaratish
@@ -18,7 +22,8 @@ class JobCategoryController {
     // Barcha Job kategoriyalarni olish
     async getAllJobCategories(req: Request, res: Response) {
         try {
-            const jobCategories = await JobCategoryModel.find().populate('jobs');
+            const jobCategories = await JobCategoryModel.find()
+
             return res.status(200).json(jobCategories);
         } catch (error: any) {
             console.error('Xatolik:', error.message);
@@ -30,7 +35,17 @@ class JobCategoryController {
     async getJobCategoryById(req: Request, res: Response) {
         const jobCategoryId = req.params.id;
         try {
-            const jobCategory = await JobCategoryModel.findById(jobCategoryId).populate('jobs');
+            const jobCategory = await JobCategoryModel.findById(jobCategoryId).populate({
+                path: 'jobs',
+                populate: [
+                    { path: 'jobSkills', model: Skills },
+                    { path: 'jobEmployee', model: Employees },
+                    { path: 'moreInfo', model: moreInfo },
+                    // { path: 'catId', model: JobCategoryModel },
+                    { path: 'moneyTypeId', model: moneyType  },
+                ],
+            })
+                .exec();
             if (!jobCategory) {
                 return res.status(404).json({ message: 'Job kategoriya topilmadi', status: 404 });
             }
