@@ -6,12 +6,11 @@ const SkillSchema = new Schema<IJobSkills>({
         type: String,
         required: true,
     },
-    jobId: [
+    jobId: 
         {
             type: Schema.Types.ObjectId,
             ref: 'FileData',
-        },
-    ],
+        }
 }, { timestamps: true });
 
 const Skills = model<IJobSkills>('Skills', SkillSchema);

@@ -34,7 +34,7 @@ const FileDataSchema = new Schema<IFileData>({
     jobSkills: [
         {
             type: Schema.Types.ObjectId,
-            ref: 'Skill', 
+            ref: 'Skills', 
         },
     ],
     jobType: {
