@@ -22,3 +22,15 @@ export // Berilgan fayldagi ma'lumotlar uchun schema interfeysi
     catId: string;
     moneyTypeId: Types.ObjectId; // ObjectId uchun ref
 }
+
+export interface IJobSkills extends Document {
+    skillName: string;
+    jobId: mongoose.Types.ObjectId;
+}
+
+export interface IEmployee extends Document {
+    userEmail: string;
+    userFullName: string;
+    resume: string;
+    jobId: mongoose.Types.ObjectId;
+}
