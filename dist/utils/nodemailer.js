@@ -12,7 +12,7 @@ import { generateCode } from "./generateCode.js";
 const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-        user: "mrvaliyev2006@gmail.com",
+        user: process.env.EMAIL,
         pass: process.env.EMAILPASSKEY,
     },
 });
@@ -20,7 +20,7 @@ const transporter = nodemailer.createTransport({
 export const sendConfirmationEmail = (userEmail) => __awaiter(void 0, void 0, void 0, function* () {
     const confirmationCode = generateCode(); // Tasdiqlash kodi generatsiyalansin
     const mailOptions = {
-        from: "mrvaliyev2006@gmail.com",
+        from: process.env.EMAIL,
         to: userEmail,
         subject: "Hi!",
         html: `<h1>
