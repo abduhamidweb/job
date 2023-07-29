@@ -2,9 +2,9 @@ import { Request, Response } from 'express';
 import { IJobCategory } from '../interface/interface.js';
 import JobCategoryModel from '../schemas/jobCategory.schema.js';
 import Skills from '../schemas/jobSkill.schema.js';
-import Employees from '../schemas/employee.schema.js'; 
+import Employees from '../schemas/employee.schema.js';
 import moreInfo from '../schemas/info.schema.js';
-import moneyType from '../schemas/money.schema.js'; 
+import moneyType from '../schemas/money.schema.js';
 
 class JobCategoryController {
     // Job kategoriyasi yaratish
@@ -42,7 +42,7 @@ class JobCategoryController {
                     { path: 'jobEmployee', model: Employees },
                     { path: 'moreInfo', model: moreInfo },
                     // { path: 'catId', model: JobCategoryModel },
-                    { path: 'moneyTypeId', model: moneyType  },
+                    { path: 'moneyTypeId', model: moneyType },
                 ],
             })
                 .exec();

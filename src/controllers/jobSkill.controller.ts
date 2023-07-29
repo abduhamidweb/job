@@ -23,7 +23,7 @@ class SkillController {
             }
 
             const skill = new Skills({ skillName, jobId });
-            await skill.save(); 
+            await skill.save();
 
             if (job.jobSkills) {
                 job.jobSkills.push(skill._id);

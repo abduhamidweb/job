@@ -34,7 +34,7 @@ const FileDataSchema = new Schema<IFileData>({
     jobSkills: [
         {
             type: Schema.Types.ObjectId,
-            ref: 'Skills', 
+            ref: 'Skills',
         },
     ],
     jobType: {
@@ -52,15 +52,15 @@ const FileDataSchema = new Schema<IFileData>({
     },
     jobEmployee: [{
         type: Schema.Types.ObjectId,
-        ref: 'Employee', 
+        ref: 'Employee',
     }],
-    moreInfo:[ {
+    moreInfo: [{
         type: Schema.Types.ObjectId,
-        ref: 'MoreInfo', 
-    }], 
+        ref: 'MoreInfo',
+    }],
     catId: {
         type: String,
-        ref:"JobCategory",
+        ref: "JobCategory",
         required: true,
     },
     moneyTypeId: {

@@ -15,10 +15,10 @@ const EmployeeSchema = new Schema<IEmployee>({
         required: true,
     },
     jobId:
-        {
-            type: Schema.Types.ObjectId,
-            ref: "FileData",
-        },
+    {
+        type: Schema.Types.ObjectId,
+        ref: "FileData",
+    },
 
 });
 

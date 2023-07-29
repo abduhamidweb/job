@@ -1,10 +1,10 @@
 import { IFileData } from "../interface/interface.js";
 import FileDataModel from "../schemas/job.schema.js";
-import typeOfMoneySchema  from "../schemas/money.schema.js";
+import typeOfMoneySchema from "../schemas/money.schema.js";
 import { Request, Response } from "express";
 
 export class moneyContr {
-  constructor() {}
+  constructor() { }
   static async getType(req: Request, res: Response) {
     try {
       const { id } = req.params;
