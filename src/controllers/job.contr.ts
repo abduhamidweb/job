@@ -86,7 +86,7 @@ class FileDataController {
         }
     }
     // FileData obyektini tahrirlash
-    async updateFileData(req: Request, res: Response) {
+    async updateFileData(req: Request, res: Response) { 
         const fileId = req.params.id;
         try {
             const updatedFileData = await FileDataModel.findByIdAndUpdate(fileId, req.body, { new: true }).populate('jobSkills jobEmployee moreInfo moneyTypeId catId');
