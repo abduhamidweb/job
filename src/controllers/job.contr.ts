@@ -66,12 +66,24 @@ class FileDataController {
                 id: data._id,
                 location: data.comLocation,
             }));
-            res.send(comLocationsWithId);
+
+            // Create a Set to store unique locations
+            const uniqueLocationsSet = new Set<string>();
+            const uniqueComLocationsWithId = comLocationsWithId.filter((data) => {
+                if (!uniqueLocationsSet.has(data.location)) {
+                    uniqueLocationsSet.add(data.location);
+                    return true;
+                }
+                return false;
+            });
+
+            res.send(uniqueComLocationsWithId);
         } catch (error: any) {
             console.error(error.message);
             res.status(500).json({ message: error.message, status: 500 });
         }
     }
+
     async searchByCriteria(req: Request, res: Response): Promise<void> {
         try {
             const { comLocation, comName, jobTitle, ...restQuery } = req.query;

@@ -86,7 +86,16 @@ class FileDataController {
                     id: data._id,
                     location: data.comLocation,
                 }));
-                res.send(comLocationsWithId);
+                // Create a Set to store unique locations
+                const uniqueLocationsSet = new Set();
+                const uniqueComLocationsWithId = comLocationsWithId.filter((data) => {
+                    if (!uniqueLocationsSet.has(data.location)) {
+                        uniqueLocationsSet.add(data.location);
+                        return true;
+                    }
+                    return false;
+                });
+                res.send(uniqueComLocationsWithId);
             }
             catch (error) {
                 console.error(error.message);
