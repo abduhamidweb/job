@@ -110,6 +110,7 @@ class FileDataController {
             }
         });
     }
+    // ok
     // FileData obyektini tahrirlash
     updateFileData(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
