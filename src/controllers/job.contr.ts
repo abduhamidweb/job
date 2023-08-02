@@ -78,7 +78,7 @@ class FileDataController {
             const locationQuery = comLocation ? { comLocation: { $regex: comLocation.toString(), $options: 'i' } } : {};
             const nameQuery = comName ? { comName: { $regex: comName.toString(), $options: 'i' } } : {};
             const titleQuery = jobTitle ? { jobTitle: { $regex: jobTitle.toString(), $options: 'i' } } : {};
-            const fileData: FileData[] = await FileDataModel.find({ ...locationQuery, ...nameQuery, ...titleQuery, ...restQuery }, '-__v');
+            const fileData: FileData[] = await FileDataModel.find({ ...locationQuery, ...nameQuery, ...titleQuery, ...restQuery }, '-__v').populate('jobSkills jobEmployee moneyTypeId catId');
             res.json(fileData);
         } catch (error: any) {
             console.error(error.message);

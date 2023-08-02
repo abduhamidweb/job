@@ -101,7 +101,7 @@ class FileDataController {
                 const locationQuery = comLocation ? { comLocation: { $regex: comLocation.toString(), $options: 'i' } } : {};
                 const nameQuery = comName ? { comName: { $regex: comName.toString(), $options: 'i' } } : {};
                 const titleQuery = jobTitle ? { jobTitle: { $regex: jobTitle.toString(), $options: 'i' } } : {};
-                const fileData = yield FileDataModel.find(Object.assign(Object.assign(Object.assign(Object.assign({}, locationQuery), nameQuery), titleQuery), restQuery), '-__v');
+                const fileData = yield FileDataModel.find(Object.assign(Object.assign(Object.assign(Object.assign({}, locationQuery), nameQuery), titleQuery), restQuery), '-__v').populate('jobSkills jobEmployee moneyTypeId catId');
                 res.json(fileData);
             }
             catch (error) {
