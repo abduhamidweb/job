@@ -87,16 +87,35 @@ class FileDataController {
     async searchByCriteria(req: Request, res: Response): Promise<void> {
         try {
             const { comLocation, comName, jobTitle, ...restQuery } = req.query;
-            const locationQuery = comLocation ? { comLocation: { $regex: comLocation.toString(), $options: 'i' } } : {};
-            const nameQuery = comName ? { comName: { $regex: comName.toString(), $options: 'i' } } : {};
-            const titleQuery = jobTitle ? { jobTitle: { $regex: jobTitle.toString(), $options: 'i' } } : {};
-            const fileData: FileData[] = await FileDataModel.find({ ...locationQuery, ...nameQuery, ...titleQuery, ...restQuery }, '-__v').populate('jobSkills jobEmployee moneyTypeId catId');
+
+            let query: any = {}; // Empty object to hold the search criteria
+
+            // Check if comLocation is provided and not equal to "all"
+            if (comLocation && typeof comLocation === 'string' && comLocation.toLowerCase() !== 'all') {
+                query.comLocation = { $regex: comLocation, $options: 'i' };
+            }
+
+            // Check if comName is provided
+            if (comName && typeof comName === 'string') {
+                query.comName = { $regex: comName, $options: 'i' };
+            }
+
+            // Check if jobTitle is provided
+            if (jobTitle && typeof jobTitle === 'string') {
+                query.jobTitle = { $regex: jobTitle, $options: 'i' };
+            }
+
+            // Add any other parameters in restQuery to the search criteria
+            Object.assign(query, restQuery);
+
+            const fileData: FileData[] = await FileDataModel.find(query, '-__v').populate('jobSkills jobEmployee moneyTypeId catId');
             res.json(fileData);
         } catch (error: any) {
             console.error(error.message);
             res.status(500).json({ message: error.message, status: 500 });
         }
-    } 
+    }
+
     // okw
     // FileData obyektini tahrirlash
     async updateFileData(req: Request, res: Response) { 
