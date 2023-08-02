@@ -85,7 +85,7 @@ class FileDataController {
             res.status(500).json({ message: error.message, status: 500 });
         }
     } 
-    // ok
+    // okw
     // FileData obyektini tahrirlash
     async updateFileData(req: Request, res: Response) { 
         const fileId = req.params.id;
