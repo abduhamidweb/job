@@ -7,6 +7,7 @@ export interface IPost extends Document {
 }
 export  interface IFileData extends Document {
     comImg: string;
+    employeies: Types.ObjectId[];
     comName: string;
     comLocation: string;
     jobSave: boolean;

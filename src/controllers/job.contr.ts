@@ -2,22 +2,35 @@ import { NextFunction, Request, Response } from 'express';
 import FileDataModel from '../schemas/job.schema.js';
 import { ComLocationData, FileData, IFileData, IJobCategory } from '../interface/interface';
 import JobCategoryModel from '../schemas/jobCategory.schema.js';
-
+import { JWT } from '../utils/jwt.js';
+import userSchema from '../schemas/user.schema.js';
 class FileDataController {
     // FileData yaratish
     async createFileData(req: Request, res: Response, next: NextFunction) {
         try {
             const fileData: IFileData = req.body;
             const newFileData = await FileDataModel.create(fileData);
+            let token: string | undefined = req.headers.token as string;
+            let userId = JWT.VERIFY(token).id;
+            if (!userId) return res.status(401).send({
+                message: "Invalid token",
+                data: userId
+            })
+            let user = await userSchema.findByIdAndUpdate(userId, {
+                $push: {
+                    posts: newFileData._id
+                }
+            });
+            if (!user) return res.status(404).send({
+                message: "User not found",
+                data: user
+            })
             const { catId } = fileData;
-
             if (!catId) {
                 const errorMessage = 'catId kiritilmagan';
                 return res.status(400).json({ message: errorMessage, status: 400 });
             }
-
             const jobCategory: IJobCategory | null = await JobCategoryModel.findById(catId);
-
             if (!jobCategory) {
                 const errorMessage = 'Job kategoriyasi topilmadi';
                 console.error(errorMessage);
@@ -26,7 +39,7 @@ class FileDataController {
 
             jobCategory.jobs.push(newFileData._id);
             await jobCategory.save();
-
+            await user?.save();
             return res.status(201).json(newFileData);
         } catch (error: any) {
             console.error(error.message);
@@ -49,7 +62,16 @@ class FileDataController {
     async getFileDataById(req: Request, res: Response) {
         const fileId = req.params.id;
         try {
-            const fileData = await FileDataModel.findById(fileId).populate('jobSkills jobEmployee moreInfo moneyTypeId catId');
+            const fileData = await FileDataModel.findById(fileId).populate('jobSkills jobEmployee moreInfo moneyTypeId catId')
+            // .populate({
+            // path: "employeies",
+            // populate: [
+            // {
+            // path:""
+            // }
+            // ]
+            // })
+
             if (!fileData) {
                 return res.status(404).json({ message: 'FileData topilmadi', status: 404 });
             }
@@ -118,7 +140,7 @@ class FileDataController {
 
     // okw
     // FileData obyektini tahrirlash
-    async updateFileData(req: Request, res: Response) { 
+    async updateFileData(req: Request, res: Response) {
         const fileId = req.params.id;
         try {
             const updatedFileData = await FileDataModel.findByIdAndUpdate(fileId, req.body, { new: true }).populate('jobSkills jobEmployee moreInfo moneyTypeId catId');

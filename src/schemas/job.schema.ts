@@ -3,6 +3,12 @@ import validator from 'validator';
 import { IFileData } from '../interface/interface';
 
 const FileDataSchema = new Schema<IFileData>({
+    employeies: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "Users"
+        }
+    ],
     comImg: {
         type: String,
         required: true,
