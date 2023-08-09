@@ -74,7 +74,6 @@ const FileDataSchema = new Schema<IFileData>({
         ref: 'TypeOfMoney', // "TypeOfMoney" nomli boshqa modelga bog'lanish uchun ref
     },
 });
-
 // Model yaratish
 const FileDataModel = model<IFileData>('FileData', FileDataSchema);
 

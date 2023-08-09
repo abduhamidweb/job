@@ -5,6 +5,14 @@ export interface IPost extends Document {
     content: string;
     user: mongoose.Types.ObjectId;
 }
+export interface IEducation extends Document {
+    name: string;
+    degree: string;
+    fieldOfStudy: string;
+    startDate: Date;
+    endDate: Date;
+  }
+  
 export  interface IFileData extends Document {
     comImg: string;
     employeies: Types.ObjectId[];
