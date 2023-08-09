@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { LanguageContr } from '../controllers/language.controller';
+import { LanguageContr } from '../controllers/language.controller.js';
 const router = Router();
 
 router.get('/', LanguageContr.getLanguage)

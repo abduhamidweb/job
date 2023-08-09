@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import Skill from "../schemas/skill.schema";
+import Skill from "../schemas/skill.schema.js";
 
 export class SkillContr {
   static async postSkill(req: Request, res: Response) {

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import Language from "../schemas/language.schema";
+import Language from "../schemas/language.schema.js";
 
 export class LanguageContr {
   static async postLanguage(req: Request, res: Response) {
