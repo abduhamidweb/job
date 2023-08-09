@@ -10,6 +10,9 @@ export class LanguageContr {
       }
       const newType = await Language.create({ language, level });
       await newType.save();
+
+      const userId = req.headers.token as string;
+
       res.send({
         status: 200,
         message: `The language was added successfuly!`,
@@ -65,6 +68,9 @@ export class LanguageContr {
         { language, level },
         { new: true }
       );
+
+      const userId = req.headers.token as string;
+
       res.send({
         status: 200,
         message: `Language was updated successfuly!`,
@@ -84,6 +90,9 @@ export class LanguageContr {
         throw new Error(`Not found info`);
       }
       const deletedLanguage = await Language.findByIdAndDelete(id);
+
+      const userId = req.headers.token as string;
+      
       res.send({
         status: 200,
         message: `Language was deleted successfuly!`,

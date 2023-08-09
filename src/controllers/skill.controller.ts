@@ -10,6 +10,9 @@ export class SkillContr {
       }
       const newType = await Skill.create({ skill, experience, level });
       await newType.save();
+
+      const userId = req.headers.token as string;
+
       res.send({
         status: 200,
         message: `The skill was added successfuly!`,
@@ -65,6 +68,9 @@ export class SkillContr {
         { skill, experience, level },
         { new: true }
       );
+
+      const userId = req.headers.token as string;
+
       res.send({
         status: 200,
         message: `Skill was updated successfuly!`,
@@ -84,6 +90,9 @@ export class SkillContr {
         throw new Error(`Not found info`);
       }
       const deletedSkill = await Skill.findByIdAndDelete(id);
+
+      const userId = req.headers.token as string;
+      
       res.send({
         status: 200,
         message: `Skill was deleted successfuly!`,
