@@ -12,7 +12,15 @@ export interface IEducation extends Document {
     startDate: Date;
     endDate: Date;
   }
-  
+  export interface IRecruiter extends Document {
+    email: string;
+    companyName: string;
+    website?: string;
+    posts: Types.ObjectId[];
+    location?: string;
+    name?: string;
+    phoneNumber?: string;
+  }
 export  interface IFileData extends Document {
     comImg: string;
     employeies: Types.ObjectId[];
