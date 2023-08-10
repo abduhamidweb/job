@@ -106,7 +106,7 @@ export default {
     try {
 
       let token = req.headers.token as string
-console.log(JWT.VERIFY(token).id);
+console.log(JWT.VERIFY(token).id); 
 
 
       const id = req.params.id;
