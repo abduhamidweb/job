@@ -1,13 +1,11 @@
-import { Schema, model, Document, Types } from 'mongoose';
+import { Schema, model } from 'mongoose';
 import validator from 'validator';
-import { IFileData } from '../interface/interface';
-
-const FileDataSchema = new Schema<IFileData>({
+const FileDataSchema = new Schema({
     comImg: {
         type: String,
         required: true,
         validate: {
-            validator: (value: string) => validator.isURL(value),
+            validator: (value) => validator.isURL(value),
             message: 'Noto\'g\'ri URL formati',
         },
     },
@@ -51,13 +49,13 @@ const FileDataSchema = new Schema<IFileData>({
         min: 0,
     },
     jobEmployee: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Employee',
-    }],
+            type: Schema.Types.ObjectId,
+            ref: 'Employee',
+        }],
     moreInfo: [{
-        type: Schema.Types.ObjectId,
-        ref: 'MoreInfo',
-    }],
+            type: Schema.Types.ObjectId,
+            ref: 'MoreInfo',
+        }],
     catId: {
         type: String,
         ref: "JobCategory",
@@ -68,8 +66,6 @@ const FileDataSchema = new Schema<IFileData>({
         ref: 'TypeOfMoney', // "TypeOfMoney" nomli boshqa modelga bog'lanish uchun ref
     },
 });
-
 // Model yaratish
-const FileDataModel = model<IFileData>('FileData', FileDataSchema);
-
+const FileDataModel = model('FileData', FileDataSchema);
 export default FileDataModel;

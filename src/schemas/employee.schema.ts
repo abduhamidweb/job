@@ -19,6 +19,10 @@ const EmployeeSchema = new Schema<IEmployee>({
         type: Schema.Types.ObjectId,
         ref: "FileData",
     },
+<<<<<<< HEAD
+=======
+
+>>>>>>> 49b20ff426beedd77f772f95c941275a785a4bae
 });
 
 const Employees = model<IEmployee>("Employee", EmployeeSchema);

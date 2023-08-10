@@ -14,12 +14,12 @@ app.use(fileUpload());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(`${process.cwd()}/src/public`));
 app.use("/api", indexRouter);
-
+ 
 app.get("/api", async (req: Request, res: Response) => {
     try {
         res.status(200).json({
             success: true,
-            message: "Welcome to the Jop API",
+            message: "Welcome to the Jop API.",
             postmen: "https://documenter.getpostman.com/view/24139682/2s93si1pwE",
         });
     } catch (error: unknown) {

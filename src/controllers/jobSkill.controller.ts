@@ -1,13 +1,37 @@
 import { Request, Response } from "express";
 import Skills from "../schemas/jobSkill.schema.js";
-import { IJobSkills } from '../interface/interface';
+import { FileData, IJobSkills } from '../interface/interface';
+import JobModel from "../schemas/job.schema.js";
 
 class SkillController {
     public async postSkill(req: Request, res: Response): Promise<void> {
         const { skillName, jobId }: IJobSkills = req.body;
         try {
+            if (!jobId) {
+                const errorMessage = 'jobId kiritilmagan';
+                res.status(400).json({ message: errorMessage, status: 400 });
+                return;
+            }
+
+            const job = await JobModel.findById(jobId);
+
+            if (!job) {
+                const errorMessage = 'Job kategoriyasi topilmadi';
+                console.error(errorMessage);
+                res.status(404).json({ message: errorMessage, status: 404 });
+                return;
+            }
+
             const skill = new Skills({ skillName, jobId });
             await skill.save();
+
+            if (job.jobSkills) {
+                job.jobSkills.push(skill._id);
+            } else {
+                job.jobSkills = [skill._id];
+            }
+            await job.save();
+
             res.status(201).json("Successfully created Skill");
         } catch (error: any) {
             res.status(500).json({ error: error.message });
