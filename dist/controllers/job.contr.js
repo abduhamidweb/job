@@ -86,7 +86,16 @@ class FileDataController {
                     id: data._id,
                     location: data.comLocation,
                 }));
-                res.send(comLocationsWithId);
+                // Create a Set to store unique locations
+                const uniqueLocationsSet = new Set();
+                const uniqueComLocationsWithId = comLocationsWithId.filter((data) => {
+                    if (!uniqueLocationsSet.has(data.location)) {
+                        uniqueLocationsSet.add(data.location);
+                        return true;
+                    }
+                    return false;
+                });
+                res.send(uniqueComLocationsWithId);
             }
             catch (error) {
                 console.error(error.message);
@@ -98,10 +107,22 @@ class FileDataController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const _a = req.query, { comLocation, comName, jobTitle } = _a, restQuery = __rest(_a, ["comLocation", "comName", "jobTitle"]);
-                const locationQuery = comLocation ? { comLocation: { $regex: comLocation.toString(), $options: 'i' } } : {};
-                const nameQuery = comName ? { comName: { $regex: comName.toString(), $options: 'i' } } : {};
-                const titleQuery = jobTitle ? { jobTitle: { $regex: jobTitle.toString(), $options: 'i' } } : {};
-                const fileData = yield FileDataModel.find(Object.assign(Object.assign(Object.assign(Object.assign({}, locationQuery), nameQuery), titleQuery), restQuery), '-__v');
+                let query = {}; // Empty object to hold the search criteria
+                // Check if comLocation is provided and not equal to "all"
+                if (comLocation && typeof comLocation === 'string' && comLocation.toLowerCase() !== 'all') {
+                    query.comLocation = { $regex: comLocation, $options: 'i' };
+                }
+                // Check if comName is provided
+                if (comName && typeof comName === 'string') {
+                    query.comName = { $regex: comName, $options: 'i' };
+                }
+                // Check if jobTitle is provided
+                if (jobTitle && typeof jobTitle === 'string') {
+                    query.jobTitle = { $regex: jobTitle, $options: 'i' };
+                }
+                // Add any other parameters in restQuery to the search criteria
+                Object.assign(query, restQuery);
+                const fileData = yield FileDataModel.find(query, '-__v').populate('jobSkills jobEmployee moneyTypeId catId');
                 res.json(fileData);
             }
             catch (error) {
@@ -110,6 +131,7 @@ class FileDataController {
             }
         });
     }
+    // okw
     // FileData obyektini tahrirlash
     updateFileData(req, res) {
         return __awaiter(this, void 0, void 0, function* () {

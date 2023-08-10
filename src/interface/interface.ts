@@ -5,8 +5,17 @@ export interface IPost extends Document {
     content: string;
     user: mongoose.Types.ObjectId;
 }
+export interface IEducation extends Document {
+    name: string;
+    degree: string;
+    fieldOfStudy: string;
+    startDate: Date;
+    endDate: Date;
+  }
+  
 export  interface IFileData extends Document {
     comImg: string;
+    employeies: Types.ObjectId[];
     comName: string;
     comLocation: string;
     jobSave: boolean;
@@ -50,4 +59,15 @@ export interface IEmployee extends Document {
     userFullName: string;
     resume: string;
     jobId: mongoose.Types.ObjectId;
+}
+
+export interface ILanguage {
+    language: string;
+    level: number;
+}
+
+export interface ISkill {
+    skill: string;
+    experience: number;
+    level: string;
 }

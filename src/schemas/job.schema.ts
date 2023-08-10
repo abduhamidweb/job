@@ -3,6 +3,12 @@ import validator from 'validator';
 import { IFileData } from '../interface/interface';
 
 const FileDataSchema = new Schema<IFileData>({
+    employeies: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "Users"
+        }
+    ],
     comImg: {
         type: String,
         required: true,
@@ -68,7 +74,6 @@ const FileDataSchema = new Schema<IFileData>({
         ref: 'TypeOfMoney', // "TypeOfMoney" nomli boshqa modelga bog'lanish uchun ref
     },
 });
-
 // Model yaratish
 const FileDataModel = model<IFileData>('FileData', FileDataSchema);
 
