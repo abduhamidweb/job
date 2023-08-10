@@ -9,6 +9,7 @@ class RecruiterController {
         try {
             const recruiterData: IRecruiter = req.body;
             const newRecruiter = await RecruiterModel.create(recruiterData);
+            await newRecruiter.save();
             return res.status(201).json(newRecruiter);
         } catch (error: any) {
             console.error(error.message);
@@ -50,6 +51,7 @@ class RecruiterController {
             if (!updatedRecruiter) {
                 return res.status(404).json({ message: 'Recruiter not found', status: 404 });
             }
+            await updatedRecruiter.save();
             return res.status(200).json(updatedRecruiter);
         } catch (error: any) {
             console.error(error.message);
