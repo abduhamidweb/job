@@ -71,7 +71,7 @@ export interface IEmployee extends Document {
 
 export interface ILanguage {
     language: string;
-    level: number;
+    level: string;
 }
 
 export interface ISkill {

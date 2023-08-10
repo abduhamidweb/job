@@ -7,7 +7,7 @@ const LanguageSchema = new Schema<ILanguage>({
         required: true,
     },
     level: {
-        type: Number,
+    type: String,
         required: true,
     },
 });
