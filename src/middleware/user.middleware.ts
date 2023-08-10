@@ -8,8 +8,8 @@ import { JWT } from "../utils/jwt.js";
 export default {
   async checkBody(req: Request, res: Response, next: NextFunction) {
     try {
-      const { fullName, userName, userEmail: email, password } = req.body;
-      if (!fullName || !userName || !email || !password) {
+      const { fullName, userName, userEmail: email, password} = req.body;
+      if (!fullName || !userName || !email || !password ) {
         return err(res, "Invalid data", 400);
       }
       let userNameCheck: any = await Users.findOne({
@@ -24,14 +24,14 @@ export default {
       } else if (emailCheck) {
         return err(res, "The email is already taken", 409);
       }
-
+     
       let userTest = new Users({
         fullName,
         userName,
         email,
-        password,
+        password
       });
-      let m = await userTest.save();
+      await userTest.save();
 
       await Users.findOneAndDelete({ userName });
       next();
@@ -95,4 +95,23 @@ export default {
       return err(res, "Forbidden", 403);
     }
   },
-}; 
+  async checkPutData(req: Request, res: Response, next: NextFunction) {
+    try {
+      let { id } = req.params
+let {
+  profilePicture,
+  available,
+  resume,
+  nationality,
+  residence,
+  aboutyourself,
+} = req.body;
+
+      // let userRole = (await Users.findById(id))?.role
+      // if(!userRole) return err(res)
+      
+    } catch (error) {
+      
+    }
+  }
+};

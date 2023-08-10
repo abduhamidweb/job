@@ -12,7 +12,7 @@ let { msg, send } = responser;
 const client = redis.createClient({
   url: "redis://default:cWORnYkLiNeTFRVuauwwTN3exTNYLoDi@redis-12791.c291.ap-southeast-2-1.ec2.cloud.redislabs.com:12791",
 });
-client.on("connect", function () { });
+client.on("connect", function () {});
 
 client.on("error", function (error) {
   console.error("Redis serverga bog'lanishda xatolik yuz berdi:", error);
@@ -28,6 +28,7 @@ export default {
         userName,
         userEmail: email,
         password,
+        role,
         confirmationCode,
       } = req.body;
 
@@ -49,6 +50,7 @@ export default {
         fullName,
         userName,
         email,
+        role,
         password: sha256(password),
       });
       await user.save();
@@ -102,10 +104,36 @@ export default {
   },
   async put(req: Request, res: Response) {
     try {
-      const id = req.params.id;
-      const updateData = req.body;
 
-      if (Object.keys(updateData).length === 0) {
+      let token = req.headers.token as string
+console.log(JWT.VERIFY(token).id);
+
+
+      const id = req.params.id;
+      const allData = req.body;
+      req.body = req.body;
+
+      const updateData: {
+        profilePicture: any;
+        available: any;
+        resume: any;
+        nationality: any;
+        residence: any;
+        aboutyourself: any;
+      } = req.body;
+const requiredProperties = [
+  "profilePicture",
+  "available",
+  "resume",
+  "nationality",
+  "residence",
+  "aboutyourself",
+];
+
+const foundProperty = requiredProperties.find((property) => req.body[property]);
+
+
+      if (Object.keys(updateData).length === 0 || !foundProperty) {
         return err(res, "No data provided for update.", 400);
       }
 
@@ -115,20 +143,11 @@ export default {
         return res.status(404).json({ message: "User not found." });
       }
       for (const field in updateData) {
-        isNaN(updateData[field])
-          ? (updateData[field] = updateData[field].trim())
-          : "";
-        if (
-          updateData[field] !== undefined &&
-          updateData[field] !== null &&
-          updateData[field] !== ""
-        ) {
-          if (field == "password") {
-            existingData[field] = sha256(updateData[field]);
-          } else if (field == "userEmail") {
-            existingData.email = updateData[field];
-          } else {
-            existingData[field] = updateData[field];
+        if (updateData.hasOwnProperty(field)) {
+          const fieldValue = updateData[field as keyof typeof updateData];
+
+          if (fieldValue) {
+            existingData[field] = fieldValue;
           }
         }
       }
