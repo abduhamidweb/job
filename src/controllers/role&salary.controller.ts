@@ -7,7 +7,9 @@ import { JWT } from "../utils/jwt.js";
 
 class RoleAndSalaryController {
     public async postRoleAndSalary(req: Request, res: Response): Promise<void> {
-        const token = req.headers.authorization?.split(' ')[1];
+        const token = req.headers.token as string;
+        console.log(token);
+        
         let userId = JWT.VERIFY(token as string).id
         const { preferredRole, monthlySalary, expectedSalary }: IRoleAndSalary = req.body;
 

@@ -7,7 +7,7 @@ import { JWT } from "../utils/jwt.js";
 
 class ExperienceController {
     public async postExperience(req: Request, res: Response): Promise<void> {
-        const token = req.headers.authorization?.split(' ')[1];
+        const token = req.headers.token as string;
         let userId = JWT.VERIFY(token as string).id
         const { experience, remoteExperience }: IExperience = req.body;
 
