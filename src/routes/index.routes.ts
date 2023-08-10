@@ -7,6 +7,8 @@ import authMiddleware from "../middleware/auth.js";
 import { router as skillRouter } from "./jobSkill.routes.js";
 import jobCategoryRouter from "./jobCategory.routes.js"
 import { router as employeeRouter } from "./eployee.routes.js";
+import { router as experienceRouter } from "./experience.routes.js";
+import { router as roleAndSalaryRouter } from "./role&salary.routes.js";
 const router = express.Router();
 
 router.use('/test', () => { });
@@ -17,5 +19,7 @@ router.use('/user', UserRoutes);
 router.use('/money', moneyRouter);
 router.use('/employees', employeeRouter);
 router.use('/category', jobCategoryRouter);
+router.use('/experience', experienceRouter);
+router.use('/roleAndSalary', roleAndSalaryRouter);
 
 export default router

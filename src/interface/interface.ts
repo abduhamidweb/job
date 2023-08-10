@@ -51,3 +51,16 @@ export interface IEmployee extends Document {
     resume: string;
     jobId: mongoose.Types.ObjectId;
 }
+
+export interface IExperience extends Document {
+    experience: number;
+    remoteExperience: number;
+    userId: mongoose.Types.ObjectId;
+}
+
+export interface IRoleAndSalary extends Document {
+    preferredRole: string;
+    monthlySalary: number;
+    expectedSalary: number;
+    userId: mongoose.Types.ObjectId;
+}
