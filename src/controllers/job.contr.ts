@@ -3,7 +3,7 @@ import FileDataModel from '../schemas/job.schema.js';
 import { ComLocationData, FileData, IFileData, IJobCategory } from '../interface/interface';
 import JobCategoryModel from '../schemas/jobCategory.schema.js';
 import { JWT } from '../utils/jwt.js';
-import userSchema from '../schemas/user.schema.js';
+import recRuiterSchema from '../schemas/recruiter.schema.js';
 class FileDataController {
     // FileData yaratish
     async createFileData(req: Request, res: Response, next: NextFunction) {
@@ -16,7 +16,7 @@ class FileDataController {
                 message: "Invalid token",
                 data: userId
             })
-            let user = await userSchema.findByIdAndUpdate(userId, {
+            let user = await recRuiterSchema.findByIdAndUpdate(userId, {
                 $push: {
                     posts: newFileData._id
                 }

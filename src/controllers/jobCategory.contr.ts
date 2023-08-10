@@ -35,7 +35,8 @@ class JobCategoryController {
     async getJobCategoryById(req: Request, res: Response) {
         const jobCategoryId = req.params.id;
         try {
-            const jobCategory = await JobCategoryModel.findById(jobCategoryId).populate({
+            const jobCategory = await JobCategoryModel.findById(jobCategoryId)
+                .populate({
                 path: 'jobs',
                 populate: [
                     { path: 'jobSkills', model: Skills },
