@@ -7,6 +7,7 @@ const router: Router = Router();
 router.get('/', RecruiterController.getAllRecruiters);
 router.get('/:id', RecruiterController.getRecruiterById);
 router.post('/', RecruiterController.createRecruiter);
+router.post('/login', RecruiterController.loginRecruiter);
 router.put('/:id',authMiddleware, RecruiterController.updateRecruiter);
 router.delete('/:id',authMiddleware, RecruiterController.deleteRecruiter);
 

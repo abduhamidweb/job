@@ -11,17 +11,18 @@ export interface IEducation extends Document {
     fieldOfStudy: string;
     startDate: Date;
     endDate: Date;
-  }
-  export interface IRecruiter extends Document {
+}
+export interface IRecruiter extends Document {
     email: string;
     companyName: string;
+    password: string;
     website?: string;
     posts: Types.ObjectId[];
     location?: string;
     name?: string;
     phoneNumber?: string;
-  }
-export  interface IFileData extends Document {
+}
+export interface IFileData extends Document {
     comImg: string;
     employeies: Types.ObjectId[];
     comName: string;
