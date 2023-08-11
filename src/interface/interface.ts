@@ -78,4 +78,17 @@ export interface ISkill {
     skill: string;
     experience: number;
     level: string;
+
+}
+export interface IExperience extends Document {
+    experience: number;
+    remoteExperience: number;
+    userId: mongoose.Types.ObjectId;
+}
+
+export interface IRoleAndSalary extends Document {
+    preferredRole: string;
+    monthlySalary: number;
+    expectedSalary: number;
+    userId: mongoose.Types.ObjectId;
 }

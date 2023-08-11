@@ -10,6 +10,8 @@ import educationRouter from "./education.routes.js";
 import jobCategoryRouter from "./jobCategory.routes.js"
 import { router as skillRouterOld } from "./jobSkill.routes.js";
 import { router as employeeRouter } from "./eployee.routes.js";
+import { router as experienceRouter } from "./experience.routes.js";
+import { router as roleAndSalaryRouter } from "./role&salary.routes.js";
 const router = express.Router();
 
 router.use('/test', () => { });
@@ -24,5 +26,7 @@ router.use('/recruiter', recruiterRouter);
 router.use('/education', educationRouter);
 router.use('/employees', employeeRouter);
 router.use('/category', jobCategoryRouter);
+router.use('/experience', experienceRouter);
+router.use('/roleAndSalary', roleAndSalaryRouter);
 
 export default router
