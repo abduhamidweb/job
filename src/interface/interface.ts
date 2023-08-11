@@ -92,4 +92,20 @@ export interface IRoleAndSalary extends Document {
     monthlySalary: number;
     expectedSalary: number;
     userId: mongoose.Types.ObjectId;
-} 
+}
+export interface IResume extends Document {
+    title: string;
+    content: string;
+    filePath: string; // Fayl manzili
+    user: Types.ObjectId; // User bilan bog'liq ma'lumot
+}
+export interface UploadedFile {
+    fieldname: string;
+    originalname: string;
+    encoding: string;
+    mimetype: string;
+    destination: string;
+    filename: string;
+    path: string;
+    size: number;
+}
