@@ -91,4 +91,4 @@ export interface IRoleAndSalary extends Document {
     monthlySalary: number;
     expectedSalary: number;
     userId: mongoose.Types.ObjectId;
-}
+} 
