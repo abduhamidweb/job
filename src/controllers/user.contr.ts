@@ -173,5 +173,5 @@ const foundProperty = requiredProperties.find((property) => req.body[property]);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
-  },
+  }, 
 };
