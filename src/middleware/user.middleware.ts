@@ -85,20 +85,4 @@ export default {
       return err(res, "Forbidden", 403);
     }
   },
-  async checkPutData(req: Request, res: Response, next: NextFunction) {
-    try {
-      let { id } = req.params;
-      let {
-        profilePicture,
-        available,
-        resume,
-        nationality,
-        residence,
-        aboutyourself,
-      } = req.body;
-
-      // let userRole = (await Users.findById(id))?.role
-      // if(!userRole) return err(res)
-    } catch (error) {}
-  },
 };

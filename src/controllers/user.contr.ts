@@ -109,6 +109,16 @@ export default {
 
       if (req.files && req.files.profilePicture) {
         const profilePicture: any = req.files.profilePicture;
+        const allowedExtensions = [".jpg", ".jpeg", ".png"];
+
+        const ext = path.extname(profilePicture.name).toLowerCase();
+
+        if (!allowedExtensions.includes(ext)) {
+          return res
+            .status(400)
+            .json({ message: "Only JPEG and PNG image files are allowed" });
+        }
+
         const fileName = id + "." + profilePicture.mimetype.split("/")[1];
         let direction = path.join(process.cwd(), "src", "public", "images");
         const uploadPath = path.join(direction, fileName);
@@ -149,7 +159,10 @@ export default {
         (property) => req.body[property]
       );
 
-      if (((Object.keys(updateData).length === 0 || !foundProperty)) && !req.files ) {
+      if (
+        (Object.keys(updateData).length === 0 || !foundProperty) &&
+        !req.files
+      ) {
         return err(res, "No data provided for update.", 400);
       }
 
