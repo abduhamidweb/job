@@ -7,7 +7,7 @@ const resumeSchema = new Schema<IResume>({
     },
     user: {
         type: Schema.Types.ObjectId,
-        ref: "User", // "Users" o'rniga "User"
+        ref: "Users", // "Users" o'rniga "User"
         required: true,
     },
 });
