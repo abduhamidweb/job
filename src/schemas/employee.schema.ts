@@ -19,7 +19,6 @@ const EmployeeSchema = new Schema<IEmployee>({
         type: Schema.Types.ObjectId,
         ref: "FileData",
     },
-
 });
 
 const Employees = model<IEmployee>("Employee", EmployeeSchema);

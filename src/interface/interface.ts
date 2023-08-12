@@ -11,9 +11,18 @@ export interface IEducation extends Document {
     fieldOfStudy: string;
     startDate: Date;
     endDate: Date;
-  }
-  
-export  interface IFileData extends Document {
+}
+export interface IRecruiter extends Document {
+    email: string;
+    companyName: string;
+    password: string;
+    website?: string;
+    posts: Types.ObjectId[];
+    location?: string;
+    name?: string;
+    phoneNumber?: string;
+}
+export interface IFileData extends Document {
     comImg: string;
     employeies: Types.ObjectId[];
     comName: string;
@@ -63,11 +72,40 @@ export interface IEmployee extends Document {
 
 export interface ILanguage {
     language: string;
-    level: number;
+    level: string;
 }
 
 export interface ISkill {
     skill: string;
     experience: number;
     level: string;
+
+}
+export interface IExperience extends Document {
+    experience: number;
+    remoteExperience: number;
+    userId: mongoose.Types.ObjectId;
+}
+
+export interface IRoleAndSalary extends Document {
+    preferredRole: string;
+    monthlySalary: number;
+    expectedSalary: number;
+    userId: mongoose.Types.ObjectId;
+}
+export interface IResume extends Document {
+    title: string;
+    content: string;
+    filePath: string; // Fayl manzili
+    user: Types.ObjectId; // User bilan bog'liq ma'lumot
+}
+export interface UploadedFile {
+    fieldname: string;
+    originalname: string;
+    encoding: string;
+    mimetype: string;
+    destination: string;
+    filename: string;
+    path: string;
+    size: number;
 }
