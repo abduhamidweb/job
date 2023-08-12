@@ -12,14 +12,6 @@ const userSchema = new Schema({
     minlength: [3, "Name must be at least 3 characters long"],
     maxlength: [64, "Name cannot exceed 64 characters long"],
   },
-  userName: {
-    type: String,
-    required: true,
-    unique: true,
-    minlength: [5, "Username must be at least 5 characters long"],
-    maxlength: [32, "Username cannot exceed 32 characters"],
-    match: [/^[A-Za-z0-9]+$/, "Username can only contain letters and numbers"],
-  },
   email: {
     type: String,
     required: true,
@@ -35,10 +27,6 @@ const userSchema = new Schema({
   },
   profilePicture: {
     type: String,
-    validate: {
-      validator: validator.isURL,
-      message: "Invalid image",
-    },
   },
   available: {
     type: Boolean,
@@ -48,14 +36,15 @@ const userSchema = new Schema({
     },
   },
   resume: {
-    type: String,
-    validate: {
-      validator: validator.isURL,
-      message: "Invalid resume",
-    },
+    type: mongoose.Types.ObjectId,
   },
   nationality: {
     type: String,
+    enum: {
+      values: countries.all.map((e) => e.name),
+      message: "Invalid nation selected",
+    },
+    required: false,
   },
   residence: {
     type: String,
@@ -119,6 +108,7 @@ const userSchema = new Schema({
   lang: {
     type: [
       {
+        ref: "languages",
         type: mongoose.Types.ObjectId,
         validate: {
           validator: function (value: string) {

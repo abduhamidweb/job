@@ -8,32 +8,27 @@ import { JWT } from "../utils/jwt.js";
 export default {
   async checkBody(req: Request, res: Response, next: NextFunction) {
     try {
-      const { fullName, userName, userEmail: email, password} = req.body;
-      if (!fullName || !userName || !email || !password ) {
+      const { fullName, userEmail: email, password } = req.body;
+      if (!fullName || !email || !password) {
         return err(res, "Invalid data", 400);
       }
-      let userNameCheck: any = await Users.findOne({
-        userName: userName,
-      });
+
       const emailCheck: any = await Users.findOne({
         email: email,
       });
 
-      if (userNameCheck) {
-        return err(res, "The username is already taken", 409);
-      } else if (emailCheck) {
+      if (emailCheck) {
         return err(res, "The email is already taken", 409);
       }
-     
+
       let userTest = new Users({
         fullName,
-        userName,
         email,
-        password
+        password,
       });
       await userTest.save();
 
-      await Users.findOneAndDelete({ userName });
+      await Users.findOneAndDelete({ email });
       next();
     } catch (error: any) {
       err(res, error.message, 400);
@@ -59,19 +54,14 @@ export default {
   async putChecker(req: Request, res: Response, next: NextFunction) {
     try {
       let id = req.params.id;
-      const { fullName, userName, userEmail: email, password } = req.body;
-      let userNameCheck: any = await Users.findOne({
-        userName: userName,
-        _id: { $ne: id },
-      });
+      const { fullName, userEmail: email, password } = req.body;
+
       const emailCheck: any = await Users.findOne({
         email: email,
         _id: { $ne: id },
       });
 
-      if (userNameCheck) {
-        return err(res, "The username is already taken", 409);
-      } else if (emailCheck) {
+      if (emailCheck) {
         return err(res, "The email is already taken", 409);
       }
 
@@ -97,21 +87,18 @@ export default {
   },
   async checkPutData(req: Request, res: Response, next: NextFunction) {
     try {
-      let { id } = req.params
-let {
-  profilePicture,
-  available,
-  resume,
-  nationality,
-  residence,
-  aboutyourself,
-} = req.body;
+      let { id } = req.params;
+      let {
+        profilePicture,
+        available,
+        resume,
+        nationality,
+        residence,
+        aboutyourself,
+      } = req.body;
 
       // let userRole = (await Users.findById(id))?.role
       // if(!userRole) return err(res)
-      
-    } catch (error) {
-      
-    }
-  }
+    } catch (error) {}
+  },
 };

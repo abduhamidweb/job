@@ -7,6 +7,8 @@ import sha256 from "sha256";
 import { sendConfirmationEmail } from "../utils/nodemailer.js";
 import responser from "../Responser/data.js";
 import data from "../Responser/data.js";
+import path from "path";
+import fs from "fs";
 let { msg, send } = responser;
 
 const client = redis.createClient({
@@ -25,7 +27,6 @@ export default {
     try {
       const {
         fullName,
-        userName,
         userEmail: email,
         password,
         role,
@@ -48,7 +49,6 @@ export default {
 
       const user = new Users({
         fullName,
-        userName,
         email,
         role,
         password: sha256(password),
@@ -104,36 +104,52 @@ export default {
   },
   async put(req: Request, res: Response) {
     try {
+      let token = req.headers.token as string;
+      const id = JWT.VERIFY(token).id;
 
-      let token = req.headers.token as string
-console.log(JWT.VERIFY(token).id); 
+      if (req.files && req.files.profilePicture) {
+        const profilePicture: any = req.files.profilePicture;
+        const fileName = id + "." + profilePicture.mimetype.split("/")[1];
+        let direction = path.join(process.cwd(), "src", "public", "images");
+        const uploadPath = path.join(direction, fileName);
 
+        fs.readdir(direction, (err, file) => {
+          if (file[0] && file[0].split(".")[0] == id) {
+            fs.unlinkSync(direction + "/" + file[0]);
+          }
+        });
 
-      const id = req.params.id;
-      const allData = req.body;
-      req.body = req.body;
+        profilePicture.mv(uploadPath, (err: any) => {
+          if (err) {
+            return res.status(500).json({ message: err });
+          }
+        });
+        await Users.findByIdAndUpdate(id, {
+          profilePicture: "/images/" + fileName,
+        });
+      }
 
       const updateData: {
-        profilePicture: any;
+        fullName: any;
         available: any;
-        resume: any;
         nationality: any;
         residence: any;
         aboutyourself: any;
       } = req.body;
-const requiredProperties = [
-  "profilePicture",
-  "available",
-  "resume",
-  "nationality",
-  "residence",
-  "aboutyourself",
-];
+      const requiredProperties = [
+        "fullName",
+        "available",
+        "resume",
+        "nationality",
+        "residence",
+        "aboutyourself",
+      ];
 
-const foundProperty = requiredProperties.find((property) => req.body[property]);
+      const foundProperty = requiredProperties.find(
+        (property) => req.body[property]
+      );
 
-
-      if (Object.keys(updateData).length === 0 || !foundProperty) {
+      if (((Object.keys(updateData).length === 0 || !foundProperty)) && !req.files ) {
         return err(res, "No data provided for update.", 400);
       }
 
@@ -146,7 +162,7 @@ const foundProperty = requiredProperties.find((property) => req.body[property]);
         if (updateData.hasOwnProperty(field)) {
           const fieldValue = updateData[field as keyof typeof updateData];
 
-          if (fieldValue) {
+          if (fieldValue && requiredProperties.includes(field)) {
             existingData[field] = fieldValue;
           }
         }
@@ -173,5 +189,5 @@ const foundProperty = requiredProperties.find((property) => req.body[property]);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
-  }, 
+  },
 };
