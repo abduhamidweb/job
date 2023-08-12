@@ -36,6 +36,7 @@ const userSchema = new Schema({
     },
   },
   resume: {
+    ref:"Resume",
     type: mongoose.Types.ObjectId,
   },
   nationality: {
@@ -66,7 +67,7 @@ const userSchema = new Schema({
   education: {
     type: [
       {
-        ref: "educations",
+        ref: "Education",
         type: mongoose.Types.ObjectId,
         validate: {
           validator: function (value: string) {

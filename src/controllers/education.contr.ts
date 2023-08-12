@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import EducationModel from '../schemas/education.schema.js'; // I assume you have an "education.schema.ts" file
 import { IEducation } from '../interface/interface.js';
 import userSchema from '../schemas/user.schema.js';
+import { JWT } from '../utils/jwt.js';
 
 class EducationController {
     async createEducation(req: Request, res: Response, next: NextFunction) {
@@ -9,12 +10,12 @@ class EducationController {
             const educationData: IEducation = req.body;
             const newEducation = await EducationModel.create(educationData);
             // Get user ID from the header or wherever you store it
-            const userId = req.headers.token as string;
-
+            const token = req.headers.token as string;
+const userId = JWT.VERIFY(token).id;
             // Update the user document with the new education ID
             const user = await userSchema.findByIdAndUpdate(userId, {
                 $push: {
-                    educations: newEducation._id,
+                    education: newEducation._id,
                 },
             });
 

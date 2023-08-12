@@ -36,7 +36,8 @@ export default {
   },
   async idChecker(req: Request, res: Response, next: NextFunction) {
     try {
-      let id = req.params.id;
+        let token = req.headers.token as string;
+        const id = JWT.VERIFY(token).id;
 
       if (!id || !mongoose.Types.ObjectId.isValid(id)) {
         return err(res, "Invalid id", 400);

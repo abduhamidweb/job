@@ -69,7 +69,7 @@ export default {
   async get(req: Request, res: Response) {
     try {
       const userId = req.params.id;
-      const user = await Users.findById(userId);
+      const user = await Users.find().populate("education");
 
       if (!user) {
         return res.status(404).json({ message: "User not found" });
