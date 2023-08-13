@@ -30,7 +30,7 @@ class RoleAndSalaryController {
                 res.status(404).json({ message: errorMessage, status: 404 });
                 return;
             }
-
+ 
             const RoleAndSalaryPost = new RoleAndSalary({ preferredRole, monthlySalary, expectedSalary, userId });
             await RoleAndSalaryPost.save();
             await userSchema.findByIdAndUpdate(userId, {

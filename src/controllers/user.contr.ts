@@ -74,7 +74,8 @@ export default {
         .populate("resume")
         .populate("experience")
         .populate("roleAndSalary")
-        .populate("skills");
+        .populate("skills")
+        .populate("lang")
 
       if (!user) {
         return res.status(404).json({ message: "User not found" });

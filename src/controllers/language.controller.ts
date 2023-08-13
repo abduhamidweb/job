@@ -1,9 +1,14 @@
 import { Request, Response } from "express";
 import Language from "../schemas/language.schema.js";
+import userSchema from "../schemas/user.schema.js";
+import { JWT } from "../utils/jwt.js";
 
 export class LanguageContr {
   static async postLanguage(req: Request, res: Response) {
     try {
+      const token = req.headers.token as string;
+      const userId = JWT.VERIFY(token).id;
+
       const { language, level } = req.body;
       if (!language || !level) {
         throw new Error(`Data is incompleted!`);
@@ -11,7 +16,12 @@ export class LanguageContr {
       const newType = await Language.create({ language, level });
       await newType.save();
 
-      const userId = req.headers.token as string;
+      await userSchema.findByIdAndUpdate(userId, {
+        $push: {
+          lang: newType._id,
+        },
+      });
+
 
       res.send({
         status: 200,

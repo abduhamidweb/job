@@ -17,7 +17,7 @@ export class SkillContr {
 
       await userSchema.findByIdAndUpdate(userId, {
         $push: {
-          skills: newType._id,
+          skills: newType._id, 
         },
       });
 
