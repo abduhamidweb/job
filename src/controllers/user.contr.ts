@@ -76,7 +76,7 @@ export default {
         .populate("roleAndSalary")
         .populate("skills")
         .populate("lang")
-
+ 
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }

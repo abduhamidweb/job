@@ -8,7 +8,7 @@ import userSchema from "../schemas/user.schema.js";
 class ExperienceController {
     public async postExperience(req: Request, res: Response): Promise<void> {
       
-         
+          
         try {
         const token = req.headers.token as string;
         let userId = JWT.VERIFY(token as string).id;
