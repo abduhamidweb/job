@@ -36,7 +36,7 @@ const userSchema = new Schema({
     },
   },
   resume: {
-    ref:"Resume",
+    ref: "Resume",
     type: mongoose.Types.ObjectId,
   },
   nationality: {
@@ -61,7 +61,7 @@ const userSchema = new Schema({
     required: false,
   },
   experience: {
-    ref: "experiences",
+    ref: "Experience",
     type: mongoose.Types.ObjectId,
   },
   education: {
@@ -79,9 +79,8 @@ const userSchema = new Schema({
     ],
   },
   roleAndSalary: {
-    type: [
-      {
-        ref: "role&experiences",
+    
+        ref: "Role&Experience",
         type: mongoose.Types.ObjectId,
         validate: {
           validator: function (value: string) {
@@ -89,13 +88,12 @@ const userSchema = new Schema({
           },
           message: "Invalid role ID",
         },
-      },
-    ],
+    
   },
   skills: {
     type: [
       {
-        ref: "skills",
+        ref: "Skill",
         type: mongoose.Types.ObjectId,
         validate: {
           validator: function (value: string) {

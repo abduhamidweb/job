@@ -1,9 +1,13 @@
 import { Request, Response } from "express";
 import Skill from "../schemas/skill.schema.js";
+import userSchema from "../schemas/user.schema.js";
+import { JWT } from "../utils/jwt.js";
 
 export class SkillContr {
   static async postSkill(req: Request, res: Response) {
     try {
+      const token = req.headers.token as string;
+      const userId:any = JWT.VERIFY(token).id;
       const { skill, experience, level } = req.body;
       if (!skill || !level || !experience) {
         throw new Error(`Data is incompleted!`);
@@ -11,7 +15,11 @@ export class SkillContr {
       const newType = await Skill.create({ skill, experience, level });
       await newType.save();
 
-      const userId = req.headers.token as string;
+      await userSchema.findByIdAndUpdate(userId, {
+        $push: {
+          skills: newType._id,
+        },
+      });
 
       res.send({
         status: 200,
@@ -92,7 +100,7 @@ export class SkillContr {
       const deletedSkill = await Skill.findByIdAndDelete(id);
 
       const userId = req.headers.token as string;
-      
+
       res.send({
         status: 200,
         message: `Skill was deleted successfuly!`,

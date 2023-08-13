@@ -69,13 +69,19 @@ export default {
   async get(req: Request, res: Response) {
     try {
       const userId = req.params.id;
-      const user = await Users.find().populate("education");
+      const user = await Users.find()
+        .populate("education")
+        .populate("resume")
+        .populate("experience")
+        .populate("roleAndSalary")
+        .populate("skills");
 
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
       return res.status(200).json(user);
-    } catch (err) {
+    } catch (err) { 
+
       console.error("Error fetching user:", err);
       res
         .status(500)
@@ -106,9 +112,10 @@ export default {
     try {
       let token = req.headers.token as string;
       const id = JWT.VERIFY(token).id;
-
-      if (req.files && req.files.profilePicture) {
-        const profilePicture: any = req.files.profilePicture;
+    let reqFiles =req.files as any
+     
+      if (req.files && reqFiles) {
+        const profilePicture: any = reqFiles.profilePicture;
         const allowedExtensions = [".jpg", ".jpeg", ".png"];
 
         const ext = path.extname(profilePicture.name).toLowerCase();
@@ -123,17 +130,24 @@ export default {
         let direction = path.join(process.cwd(), "src", "public", "images");
         const uploadPath = path.join(direction, fileName);
 
-        fs.readdir(direction, (err, file) => {
-          if (file[0] && file[0].split(".")[0] == id) {
-            fs.unlinkSync(direction + "/" + file[0]);
-          }
-        });
-
-        profilePicture.mv(uploadPath, (err: any) => {
-          if (err) {
-            return res.status(500).json({ message: err });
-          }
-        });
+     
+          
+          fs.readdir(direction, (err, file) => {
+            if (file[0] && file[0].split(".")[0] == id) {
+              fs.unlinkSync(direction + "/" + file[0]);
+            }
+          });
+        
+        setTimeout(() => {
+            
+          profilePicture.mv(uploadPath, (err: any) => {
+            if (err) {
+              return res.status(500).json({ message: err });
+            }
+          });
+        },3)
+        
+        
         await Users.findByIdAndUpdate(id, {
           profilePicture: "/images/" + fileName,
         });

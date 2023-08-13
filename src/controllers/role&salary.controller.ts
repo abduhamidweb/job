@@ -3,17 +3,19 @@ import RoleAndSalary from "../schemas/role&salary.schema.js";
 import { IRoleAndSalary } from '../interface/interface';
 import userModel from "../schemas/user.schema.js";
 import { JWT } from "../utils/jwt.js";
+import userSchema from "../schemas/user.schema.js";
 
 
 class RoleAndSalaryController {
     public async postRoleAndSalary(req: Request, res: Response): Promise<void> {
-        const token = req.headers.token as string;
-        console.log(token);
         
-        let userId = JWT.VERIFY(token as string).id
-        const { preferredRole, monthlySalary, expectedSalary }: IRoleAndSalary = req.body;
-
         try {
+
+            const token = req.headers.token as string;
+            console.log(token);
+            
+            let userId = JWT.VERIFY(token as string).id
+            const { preferredRole, monthlySalary, expectedSalary }: IRoleAndSalary = req.body;
             if (!userId) {
                 const errorMessage = 'userId kiritilmagan';
                 res.status(400).json({ message: errorMessage, status: 400 });
@@ -31,6 +33,11 @@ class RoleAndSalaryController {
 
             const RoleAndSalaryPost = new RoleAndSalary({ preferredRole, monthlySalary, expectedSalary, userId });
             await RoleAndSalaryPost.save();
+            await userSchema.findByIdAndUpdate(userId, {
+             
+                roleAndSalary: RoleAndSalaryPost._id,
+             
+            });
 
             res.status(201).json("Successfully created Role and Salary");
         } catch (error: any) {
