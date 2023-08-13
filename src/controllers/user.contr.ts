@@ -47,7 +47,7 @@ export default {
         );
       }
 
-      const user = new Users({
+      const user:any = new Users({
         fullName,
         email,
         role,
