@@ -36,8 +36,8 @@ export default {
   },
   async idChecker(req: Request, res: Response, next: NextFunction) {
     try {
-        let token = req.headers.token as string;
-        const id = JWT.VERIFY(token).id;
+      let token = req.headers.token as string;
+      const id = JWT.VERIFY(token).id;
 
       if (!id || !mongoose.Types.ObjectId.isValid(id)) {
         return err(res, "Invalid id", 400);
@@ -85,5 +85,5 @@ export default {
     } catch (error: any) {
       return err(res, "Forbidden", 403);
     }
-  },
+  }, 
 };
