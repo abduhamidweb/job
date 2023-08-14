@@ -8,6 +8,7 @@ import { sendConfirmationEmail } from "../utils/nodemailer.js";
 import responser from "../Responser/data.js";
 import data from "../Responser/data.js";
 import path from "path";
+import jobSchema from '../schemas/job.schema.js'
 import fs from "fs";
 let { msg, send } = responser;
 
@@ -220,4 +221,28 @@ export default {
       res.status(500).json({ message: error.message });
     }
   },
+  async apply(req: Request, res: Response) {
+    try {
+      const token = req.headers.token as string;
+      const userId = JWT.VERIFY(token).id;
+      let { jobId } = req.body
+      if (!jobId) {
+       
+        return res.status(400).json({ message: "Invalid data", status: 400 });
+     }
+    let updatedJob= await  jobSchema.findByIdAndUpdate(jobId, {
+        $push: {
+          employeies: userId,
+        },
+    });
+      if (!updatedJob) {
+        return res.status(404).json({ message: "Job not found", status: 404 });
+      }
+
+      return res.status(201).json("Sucsessfully applied");
+    } catch (error:any) {
+      return res.status(500).json({error:error?.message});
+      
+    }
+  }
 };
