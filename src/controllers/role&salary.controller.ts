@@ -12,7 +12,6 @@ class RoleAndSalaryController {
         try {
 
             const token = req.headers.token as string;
-            console.log(token);
             
             let userId = JWT.VERIFY(token as string).id
             const { preferredRole, monthlySalary, expectedSalary }: IRoleAndSalary = req.body;

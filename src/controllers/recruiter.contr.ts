@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from 'express';
-import FileDataModel from '../schemas/job.schema.js';
 import RecruiterModel from '../schemas/recruiter.schema.js'; // Recruiter schema
 import { IRecruiter } from '../interface/interface.js';
 import { JWT } from '../utils/jwt.js';
@@ -87,6 +86,7 @@ class RecruiterController {
                 .populate({
                     path: 'posts',
                     populate: [
+                        { path: 'employeies', model: userSchema },
                         { path: 'jobSkills', model: Skill },
                         { path: 'catId', model: JobCategoryModel },
                         { path: 'moreInfo', model: moreinfo },
@@ -102,7 +102,30 @@ class RecruiterController {
             return res.status(500).json({ message: error.message, status: 500 });
         }
     }
-
+    async getRecruiterByToken(req: Request, res: Response) {
+        try {
+            let token = req.params.token as string;
+            let userId = JWT.VERIFY(token as string).id
+            const recruiter = await RecruiterModel.findById(userId)
+                .populate({
+                    path: 'posts',
+                    populate: [
+                        { path: 'employeies', model: userSchema },
+                        { path: 'jobSkills', model: Skill },
+                        { path: 'catId', model: JobCategoryModel },
+                        { path: 'moreInfo', model: moreinfo },
+                        { path: 'moneyTypeId', model: moneySchema }
+                    ],
+                }).exec();
+            if (!recruiter) {
+                return res.status(404).json({ message: 'Recruiter not found', status: 404 });
+            }
+            res.status(200).json(recruiter);
+        } catch (error: any) {
+            console.error(error.message);
+            return res.status(500).json({ message: error.message, status: 500 });
+        }
+    }
     // Updating a recruiter
     async updateRecruiter(req: Request, res: Response) {
         const recruiterId = req.params.id;

@@ -62,16 +62,7 @@ class FileDataController {
     async getFileDataById(req: Request, res: Response) {
         const fileId = req.params.id;
         try {
-            const fileData = await FileDataModel.findById(fileId).populate('jobSkills jobEmployee moreInfo moneyTypeId catId')
-            // .populate({
-            // path: "employeies",
-            // populate: [
-            // {
-            // path:""
-            // }
-            // ]
-            // })
-
+            const fileData = await FileDataModel.findById(fileId).populate('jobSkills jobEmployee moreInfo moneyTypeId catId employeies')
             if (!fileData) {
                 return res.status(404).json({ message: 'FileData topilmadi', status: 404 });
             }
