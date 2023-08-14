@@ -6,10 +6,10 @@ let { post, get, login, put, delete: del } = userContr
 
 
 const router = Router();
-router.get("/:id", get); 
+router.get("/", get); 
 router.post("/",checkBody ,post); 
 router.post("/login",login); 
 router.put("/", idChecker, putChecker, put); 
-router.delete("/:id",isUsersData, idChecker, del); 
+router.delete("/",del); 
  
 export default router;

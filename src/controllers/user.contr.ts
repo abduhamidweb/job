@@ -68,14 +68,15 @@ export default {
   },
   async get(req: Request, res: Response) {
     try {
-      const userId = req.params.id;
-      const user = await Users.find()
+      const token = req.headers.token as string;
+      const userId = JWT.VERIFY(token).id;
+      const user = await Users.findById(userId)
         .populate("education")
         .populate("resume")
         .populate("experience")
         .populate("roleAndSalary")
         .populate("skills")
-        .populate("lang")
+        .populate("lang");
  
       if (!user) {
         return res.status(404).json({ message: "User not found" });
@@ -207,8 +208,9 @@ export default {
   },
   async delete(req: Request, res: Response) {
     try {
-      const id: string = req.params.id;
-      const deletedUser = await Users.findByIdAndDelete(id);
+      const token = req.headers.token as string;
+    const userId = JWT.VERIFY(token).id;
+      const deletedUser = await Users.findByIdAndDelete(userId);
 
       if (!deletedUser) {
         err(res, "User not found", 404);
