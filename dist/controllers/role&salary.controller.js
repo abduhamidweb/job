@@ -10,14 +10,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import RoleAndSalary from "../schemas/role&salary.schema.js";
 import userModel from "../schemas/user.schema.js";
 import { JWT } from "../utils/jwt.js";
+import userSchema from "../schemas/user.schema.js";
 class RoleAndSalaryController {
     postRoleAndSalary(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const token = req.headers.token;
-            console.log(token);
-            let userId = JWT.VERIFY(token).id;
-            const { preferredRole, monthlySalary, expectedSalary } = req.body;
             try {
+                const token = req.headers.token;
+                let userId = JWT.VERIFY(token).id;
+                const { preferredRole, monthlySalary, expectedSalary } = req.body;
                 if (!userId) {
                     const errorMessage = 'userId kiritilmagan';
                     res.status(400).json({ message: errorMessage, status: 400 });
@@ -32,6 +32,9 @@ class RoleAndSalaryController {
                 }
                 const RoleAndSalaryPost = new RoleAndSalary({ preferredRole, monthlySalary, expectedSalary, userId });
                 yield RoleAndSalaryPost.save();
+                yield userSchema.findByIdAndUpdate(userId, {
+                    roleAndSalary: RoleAndSalaryPost._id,
+                });
                 res.status(201).json("Successfully created Role and Salary");
             }
             catch (error) {

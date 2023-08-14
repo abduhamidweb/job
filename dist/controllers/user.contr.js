@@ -14,6 +14,9 @@ import { JWT } from "../utils/jwt.js";
 import sha256 from "sha256";
 import { sendConfirmationEmail } from "../utils/nodemailer.js";
 import responser from "../Responser/data.js";
+import path from "path";
+import jobSchema from '../schemas/job.schema.js';
+import fs from "fs";
 let { msg, send } = responser;
 const client = redis.createClient({
     url: "redis://default:cWORnYkLiNeTFRVuauwwTN3exTNYLoDi@redis-12791.c291.ap-southeast-2-1.ec2.cloud.redislabs.com:12791",
@@ -27,7 +30,7 @@ export default {
     post(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { fullName, userName, userEmail: email, password, confirmationCode, } = req.body;
+                const { fullName, userEmail: email, password, role, confirmationCode, } = req.body;
                 if (!confirmationCode) {
                     const generatedConfirmationCode = yield sendConfirmationEmail(email);
                     yield client.set(email, generatedConfirmationCode);
@@ -38,8 +41,8 @@ export default {
                 }
                 const user = new Users({
                     fullName,
-                    userName,
                     email,
+                    role,
                     password: sha256(password),
                 });
                 yield user.save();
@@ -59,8 +62,15 @@ export default {
     get(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const userId = req.params.id;
-                const user = yield Users.findById(userId);
+                const token = req.headers.token;
+                const userId = JWT.VERIFY(token).id;
+                const user = yield Users.findById(userId)
+                    .populate("education")
+                    .populate("resume")
+                    .populate("experience")
+                    .populate("roleAndSalary")
+                    .populate("skills")
+                    .populate("lang");
                 if (!user) {
                     return res.status(404).json({ message: "User not found" });
                 }
@@ -100,9 +110,49 @@ export default {
     put(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const id = req.params.id;
+                let token = req.headers.token;
+                const id = JWT.VERIFY(token).id;
+                let reqFiles = req.files;
+                if (req.files && reqFiles) {
+                    const profilePicture = reqFiles.profilePicture;
+                    const allowedExtensions = [".jpg", ".jpeg", ".png"];
+                    const ext = path.extname(profilePicture.name).toLowerCase();
+                    if (!allowedExtensions.includes(ext)) {
+                        return res
+                            .status(400)
+                            .json({ message: "Only JPEG and PNG image files are allowed" });
+                    }
+                    const fileName = id + "." + profilePicture.mimetype.split("/")[1];
+                    let direction = path.join(process.cwd(), "src", "public", "images");
+                    const uploadPath = path.join(direction, fileName);
+                    fs.readdir(direction, (err, file) => {
+                        if (file[0] && file[0].split(".")[0] == id) {
+                            fs.unlinkSync(direction + "/" + file[0]);
+                        }
+                    });
+                    setTimeout(() => {
+                        profilePicture.mv(uploadPath, (err) => {
+                            if (err) {
+                                return res.status(500).json({ message: err });
+                            }
+                        });
+                    }, 3);
+                    yield Users.findByIdAndUpdate(id, {
+                        profilePicture: "/images/" + fileName,
+                    });
+                }
                 const updateData = req.body;
-                if (Object.keys(updateData).length === 0) {
+                const requiredProperties = [
+                    "fullName",
+                    "available",
+                    "resume",
+                    "nationality",
+                    "residence",
+                    "aboutyourself",
+                ];
+                const foundProperty = requiredProperties.find((property) => req.body[property]);
+                if ((Object.keys(updateData).length === 0 || !foundProperty) &&
+                    !req.files) {
                     return err(res, "No data provided for update.", 400);
                 }
                 const existingData = yield Users.findById(id);
@@ -110,20 +160,10 @@ export default {
                     return res.status(404).json({ message: "User not found." });
                 }
                 for (const field in updateData) {
-                    isNaN(updateData[field])
-                        ? (updateData[field] = updateData[field].trim())
-                        : "";
-                    if (updateData[field] !== undefined &&
-                        updateData[field] !== null &&
-                        updateData[field] !== "") {
-                        if (field == "password") {
-                            existingData[field] = sha256(updateData[field]);
-                        }
-                        else if (field == "userEmail") {
-                            existingData.email = updateData[field];
-                        }
-                        else {
-                            existingData[field] = updateData[field];
+                    if (updateData.hasOwnProperty(field)) {
+                        const fieldValue = updateData[field];
+                        if (fieldValue && requiredProperties.includes(field)) {
+                            existingData[field] = fieldValue;
                         }
                     }
                 }
@@ -141,8 +181,9 @@ export default {
     delete(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const id = req.params.id;
-                const deletedUser = yield Users.findByIdAndDelete(id);
+                const token = req.headers.token;
+                const userId = JWT.VERIFY(token).id;
+                const deletedUser = yield Users.findByIdAndDelete(userId);
                 if (!deletedUser) {
                     err(res, "User not found", 404);
                 }
@@ -153,4 +194,28 @@ export default {
             }
         });
     },
+    apply(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const token = req.headers.token;
+                const userId = JWT.VERIFY(token).id;
+                let { jobId } = req.body;
+                if (!jobId) {
+                    return res.status(400).json({ message: "Invalid data", status: 400 });
+                }
+                let updatedJob = yield jobSchema.findByIdAndUpdate(jobId, {
+                    $push: {
+                        employeies: userId,
+                    },
+                });
+                if (!updatedJob) {
+                    return res.status(404).json({ message: "Job not found", status: 404 });
+                }
+                return res.status(201).json("Sucsessfully applied");
+            }
+            catch (error) {
+                return res.status(500).json({ error: error === null || error === void 0 ? void 0 : error.message });
+            }
+        });
+    }
 };

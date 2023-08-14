@@ -20,6 +20,8 @@ var __rest = (this && this.__rest) || function (s, e) {
 };
 import FileDataModel from '../schemas/job.schema.js';
 import JobCategoryModel from '../schemas/jobCategory.schema.js';
+import { JWT } from '../utils/jwt.js';
+import recRuiterSchema from '../schemas/recruiter.schema.js';
 class FileDataController {
     // FileData yaratish
     createFileData(req, res, next) {
@@ -27,6 +29,23 @@ class FileDataController {
             try {
                 const fileData = req.body;
                 const newFileData = yield FileDataModel.create(fileData);
+                let token = req.headers.token;
+                let userId = JWT.VERIFY(token).id;
+                if (!userId)
+                    return res.status(401).send({
+                        message: "Invalid token",
+                        data: userId
+                    });
+                let user = yield recRuiterSchema.findByIdAndUpdate(userId, {
+                    $push: {
+                        posts: newFileData._id
+                    }
+                });
+                if (!user)
+                    return res.status(404).send({
+                        message: "User not found",
+                        data: user
+                    });
                 const { catId } = fileData;
                 if (!catId) {
                     const errorMessage = 'catId kiritilmagan';
@@ -40,6 +59,7 @@ class FileDataController {
                 }
                 jobCategory.jobs.push(newFileData._id);
                 yield jobCategory.save();
+                yield (user === null || user === void 0 ? void 0 : user.save());
                 return res.status(201).json(newFileData);
             }
             catch (error) {
@@ -66,7 +86,7 @@ class FileDataController {
         return __awaiter(this, void 0, void 0, function* () {
             const fileId = req.params.id;
             try {
-                const fileData = yield FileDataModel.findById(fileId).populate('jobSkills jobEmployee moreInfo moneyTypeId catId');
+                const fileData = yield FileDataModel.findById(fileId).populate('jobSkills jobEmployee moreInfo moneyTypeId catId employeies');
                 if (!fileData) {
                     return res.status(404).json({ message: 'FileData topilmadi', status: 404 });
                 }

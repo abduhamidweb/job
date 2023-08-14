@@ -45,7 +45,8 @@ class JobCategoryController {
         return __awaiter(this, void 0, void 0, function* () {
             const jobCategoryId = req.params.id;
             try {
-                const jobCategory = yield JobCategoryModel.findById(jobCategoryId).populate({
+                const jobCategory = yield JobCategoryModel.findById(jobCategoryId)
+                    .populate({
                     path: 'jobs',
                     populate: [
                         { path: 'jobSkills', model: Skills },

@@ -1,6 +1,12 @@
 import { Schema, model } from 'mongoose';
 import validator from 'validator';
 const FileDataSchema = new Schema({
+    employeies: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "Users"
+        }
+    ],
     comImg: {
         type: String,
         required: true,

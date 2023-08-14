@@ -15,30 +15,23 @@ export default {
     checkBody(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { fullName, userName, userEmail: email, password } = req.body;
-                if (!fullName || !userName || !email || !password) {
+                const { fullName, userEmail: email, password } = req.body;
+                if (!fullName || !email || !password) {
                     return err(res, "Invalid data", 400);
                 }
-                let userNameCheck = yield Users.findOne({
-                    userName: userName,
-                });
                 const emailCheck = yield Users.findOne({
                     email: email,
                 });
-                if (userNameCheck) {
-                    return err(res, "The username is already taken", 409);
-                }
-                else if (emailCheck) {
+                if (emailCheck) {
                     return err(res, "The email is already taken", 409);
                 }
                 let userTest = new Users({
                     fullName,
-                    userName,
                     email,
                     password,
                 });
-                let m = yield userTest.save();
-                yield Users.findOneAndDelete({ userName });
+                yield userTest.save();
+                yield Users.findOneAndDelete({ email });
                 next();
             }
             catch (error) {
@@ -49,7 +42,8 @@ export default {
     idChecker(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let id = req.params.id;
+                let token = req.headers.token;
+                const id = JWT.VERIFY(token).id;
                 if (!id || !mongoose.Types.ObjectId.isValid(id)) {
                     return err(res, "Invalid id", 400);
                 }
@@ -68,19 +62,12 @@ export default {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 let id = req.params.id;
-                const { fullName, userName, userEmail: email, password } = req.body;
-                let userNameCheck = yield Users.findOne({
-                    userName: userName,
-                    _id: { $ne: id },
-                });
+                const { fullName, userEmail: email, password } = req.body;
                 const emailCheck = yield Users.findOne({
                     email: email,
                     _id: { $ne: id },
                 });
-                if (userNameCheck) {
-                    return err(res, "The username is already taken", 409);
-                }
-                else if (emailCheck) {
+                if (emailCheck) {
                     return err(res, "The email is already taken", 409);
                 }
                 next();
