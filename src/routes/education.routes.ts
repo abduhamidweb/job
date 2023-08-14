@@ -10,4 +10,4 @@ router.post('/', authMiddleware, EducationController.createEducation);
 router.put('/:id', authMiddleware, EducationController.updateEducation);
 router.delete('/:id', authMiddleware, EducationController.deleteEducation);
 
-export default router;
+export default router; 
