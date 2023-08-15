@@ -1,6 +1,6 @@
 import redis from "redis";
 export const client = redis.createClient({
-    url: 'redis://default:B4JeLupwqLq3XcMD3pUK6NUhVWn0JbQD@redis-11891.c291.ap-southeast-2-1.ec2.cloud.redislabs.com:11891'
+    url: process.env.REDIST as string,
 });
 client.connect();
 client.on("connect", function () {
