@@ -35,7 +35,7 @@ class RecruiterController {
             console.error(error.message);
             return res.status(500).json({ message: error.message, status: 500 });
         }
-    }
+    } 
     async loginRecruiter(req: Request, res: Response, next: NextFunction) {
         try {
             const { email, password } = req.body;
