@@ -16,11 +16,14 @@ class RecruiterController {
             const recruiterData: IRecruiter = req.body;
 
             // Parolni hash qilish
-            const hashedPassword = await bcrypt.hash(recruiterData.password, 10);
-
+            if (recruiterData.password) {
+                const hashedPassword = await bcrypt.hash(recruiterData.password, 10);
+                recruiterData.password = hashedPassword;
+            } else {
+                const hashedPassword = await bcrypt.hash(process.env.SECRET_KEY as string, 10);
+                recruiterData.password = hashedPassword;
+            }
             // Hashlangan parolni ma'lumotlar obyektiga qo'shish
-            recruiterData.password = hashedPassword;
-
             const newRecruiter = await RecruiterModel.create(recruiterData);
             await newRecruiter.save();
 
@@ -37,23 +40,33 @@ class RecruiterController {
         try {
             const { email, password } = req.body;
             const existingRecruiter = await RecruiterModel.findOne({ email });
-
             if (!existingRecruiter) {
                 return res.status(401).json({ message: "Recruiter not found", status: 401 });
             }
-
-            const isPasswordValid = await bcrypt.compare(password, existingRecruiter.password);
-
-            if (!isPasswordValid) {
-                return res.status(401).json({ message: "Invalid password", status: 401 });
-            }
-
             const token = JWT.SIGN({ id: existingRecruiter._id });
-
-            return res.status(200).send({
-                token: token,
-                data: existingRecruiter
-            });
+            if (!existingRecruiter.password) {
+                return res.status(401).json({ message: "Password is not set", status: 401 });
+            }
+            
+            if (password) {
+                const isPasswordValid = await bcrypt.compare(password, existingRecruiter.password);
+                if (!isPasswordValid) {
+                    return res.status(401).json({ message: "Invalid password", status: 401 });
+                }
+                return res.status(200).send({
+                    token: token,
+                    data: existingRecruiter
+                });
+            } else {
+                const isPasswordValid = await bcrypt.compare(process.env.SECRET_KEY as string, existingRecruiter.password);
+                if (!isPasswordValid) {
+                    return res.status(401).json({ message: "Invalid password", status: 401 });
+                }
+                return res.status(200).send({
+                    token: token,
+                    data: existingRecruiter
+                });
+            }
         } catch (error: any) {
             console.error(error.message);
             return res.status(500).json({ message: error.message, status: 500 });

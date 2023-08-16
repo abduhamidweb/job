@@ -7,7 +7,6 @@ const recruiterSchema = new Schema({
     },
     password: {
         type: String,
-        required: true,
     },
     companyName: {
         type: String,

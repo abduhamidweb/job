@@ -8,7 +8,6 @@ const recruiterSchema = new Schema<IRecruiter>({
     },
     password: {
         type: String,
-        required: true,
     },
     companyName: {
         type: String,

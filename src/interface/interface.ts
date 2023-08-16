@@ -15,7 +15,7 @@ export interface IEducation extends Document {
 export interface IRecruiter extends Document {
     email: string;
     companyName: string;
-    password: string;
+    password?: string;
     website?: string;
     posts: Types.ObjectId[];
     location?: string;
