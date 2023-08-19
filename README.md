@@ -5,7 +5,7 @@
 ### The main objective of this project is to expedite the job search process and make it more convenient for job seekers.
 ## Installation and Usage: 
 ```sh
-npm i
+npm i 
 ```
 ```sh
 npm run dev
