@@ -5,8 +5,8 @@ import authMiddleware from '../middleware/auth.js';
 const router: Router = Router();
 
 router.get('/', RecruiterController.getAllRecruiters);
+router.get('/token', RecruiterController.getRecruiterByToken);
 router.get('/:id', RecruiterController.getRecruiterById);
-router.get('/:token',authMiddleware, RecruiterController.getRecruiterByToken);
 router.post('/', RecruiterController.createRecruiter);
 router.post('/login', RecruiterController.loginRecruiter);
 router.put('/:id',authMiddleware, RecruiterController.updateRecruiter);
