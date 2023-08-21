@@ -128,7 +128,7 @@ class RecruiterController {
                         { path: 'catId', model: JobCategoryModel },
                         { path: 'moreInfo', model: moreinfo },
                         { path: 'moneyTypeId', model: moneySchema }
-                    ],
+                    ], 
                 }).exec();
             if (!recruiter) {
                 return res.status(404).json({ message: 'Recruiter not found', status: 404 });
