@@ -134,7 +134,7 @@ class RecruiterController {
     getRecruiterByToken(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let token = req.params.token;
+                let token = req.query.token;
                 let userId = JWT.VERIFY(token).id;
                 const recruiter = yield RecruiterModel.findById(userId)
                     .populate({

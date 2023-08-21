@@ -117,7 +117,7 @@ class RecruiterController {
     }
     async getRecruiterByToken(req: Request, res: Response) {
         try {
-            let token = req.params.token as string;
+            let token = req.query.token as string;
             let userId = JWT.VERIFY(token as string).id
             const recruiter = await RecruiterModel.findById(userId)
                 .populate({
@@ -128,7 +128,7 @@ class RecruiterController {
                         { path: 'catId', model: JobCategoryModel },
                         { path: 'moreInfo', model: moreinfo },
                         { path: 'moneyTypeId', model: moneySchema }
-                    ],
+                    ], 
                 }).exec();
             if (!recruiter) {
                 return res.status(404).json({ message: 'Recruiter not found', status: 404 });
