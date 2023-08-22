@@ -15,8 +15,8 @@ export default {
     checkBody(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { fullName, userEmail: email, password } = req.body;
-                if (!fullName || !email || !password) {
+                const { fullName, userEmail: email, } = req.body;
+                if (!fullName || !email) {
                     return err(res, "Invalid data", 400);
                 }
                 const emailCheck = yield Users.findOne({
@@ -27,8 +27,7 @@ export default {
                 }
                 let userTest = new Users({
                     fullName,
-                    email,
-                    password,
+                    email
                 });
                 yield userTest.save();
                 yield Users.findOneAndDelete({ email });
