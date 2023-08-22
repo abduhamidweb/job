@@ -1,5 +1,6 @@
 import mongoose, { model, Schema } from "mongoose";
 import { isEmailValid } from "../middleware/email.cheker.js";
+import validator from "validator";
 import { countries } from "country-data-list";
 const userSchema = new Schema({
     fullName: {
@@ -18,8 +19,7 @@ const userSchema = new Schema({
         },
     },
     password: {
-        type: String,
-        required: true,
+        type: String
     },
     profilePicture: {
         type: String,
@@ -111,6 +111,18 @@ const userSchema = new Schema({
                 },
             },
         ],
+    },
+    phoneNumber: {
+        type: String,
+    },
+    linkedIn: {
+        type: String,
+        validate: {
+            validator: (value) => {
+                return validator.isURL(value);
+            },
+            message: "Invalid URL",
+        },
     },
 });
 function isBoolean(value) {

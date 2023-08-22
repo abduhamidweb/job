@@ -15,7 +15,7 @@ import sha256 from "sha256";
 import { sendConfirmationEmail } from "../utils/nodemailer.js";
 import responser from "../Responser/data.js";
 import path from "path";
-import jobSchema from '../schemas/job.schema.js';
+import jobSchema from "../schemas/job.schema.js";
 import fs from "fs";
 let { msg, send } = responser;
 const client = redis.createClient({
@@ -30,20 +30,22 @@ export default {
     post(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { fullName, userEmail: email, password, role, confirmationCode, } = req.body;
-                if (!confirmationCode) {
-                    const generatedConfirmationCode = yield sendConfirmationEmail(email);
-                    yield client.set(email, generatedConfirmationCode);
-                    return msg(res, "Confirmation code sent to the email", 200);
+                let { fullName, userEmail: email, password, confirmationCode, } = req.body;
+                if (password) {
+                    if (!confirmationCode) {
+                        const generatedConfirmationCode = yield sendConfirmationEmail(email);
+                        yield client.set(email, generatedConfirmationCode);
+                        return msg(res, "Confirmation code sent to the email", 200);
+                    }
+                    if (confirmationCode !== (yield client.get(email))) {
+                        return msg(res, "The confirmation code you entered is incorrect. Please try again.", 400);
+                    }
                 }
-                if (confirmationCode !== (yield client.get(email))) {
-                    return msg(res, "The confirmation code you entered is incorrect. Please try again.", 400);
-                }
+                let pass = process.env.SECRET_KEY;
                 const user = new Users({
                     fullName,
                     email,
-                    role,
-                    password: sha256(password),
+                    password: sha256(password || pass),
                 });
                 yield user.save();
                 client.set(email, "");
@@ -59,7 +61,30 @@ export default {
             }
         });
     },
-    get(req, res) {
+    getAll(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const user = yield Users.find()
+                    .populate("education")
+                    .populate("resume")
+                    .populate("experience")
+                    .populate("roleAndSalary")
+                    .populate("skills")
+                    .populate("lang");
+                if (!user) {
+                    return res.status(404).json({ message: "Users not found" });
+                }
+                return res.status(200).json(user);
+            }
+            catch (err) {
+                console.error("Error fetching user:", err);
+                res
+                    .status(500)
+                    .json({ message: "An error occurred while fetching the user" });
+            }
+        });
+    },
+    getOne(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const token = req.headers.token;
@@ -90,7 +115,7 @@ export default {
                 let { userEmail: email, password } = req.body;
                 let user = yield Users.findOne({
                     email,
-                    password: sha256(password),
+                    password: sha256(password || process.env.SECRET_KEY),
                 });
                 if (!user) {
                     return err(res, "Email or password wrong!", 400);
@@ -146,6 +171,8 @@ export default {
                     "fullName",
                     "available",
                     "resume",
+                    "linkedIn",
+                    "phoneNumber",
                     "nationality",
                     "residence",
                     "aboutyourself",
@@ -217,5 +244,5 @@ export default {
                 return res.status(500).json({ error: error === null || error === void 0 ? void 0 : error.message });
             }
         });
-    }
+    },
 };

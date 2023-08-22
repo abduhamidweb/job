@@ -8,8 +8,9 @@ import { sendConfirmationEmail } from "../utils/nodemailer.js";
 import responser from "../Responser/data.js";
 import data from "../Responser/data.js";
 import path from "path";
-import jobSchema from '../schemas/job.schema.js'
+import jobSchema from "../schemas/job.schema.js";
 import fs from "fs";
+import { Any } from "telegraf/typings/util.js";
 let { msg, send } = responser;
 
 const client = redis.createClient({
@@ -26,48 +27,69 @@ client.connect();
 export default {
   async post(req: Request, res: Response) {
     try {
-      const {
+      let {
         fullName,
         userEmail: email,
         password,
-        role,
         confirmationCode,
       } = req.body;
+      if (password) {
+        if (!confirmationCode) {
+          const generatedConfirmationCode = await sendConfirmationEmail(email);
+          await client.set(email, generatedConfirmationCode);
+          return msg(res, "Confirmation code sent to the email", 200);
+        }
 
-      if (!confirmationCode) {
-        const generatedConfirmationCode = await sendConfirmationEmail(email);
-        await client.set(email, generatedConfirmationCode);
-        return msg(res, "Confirmation code sent to the email", 200);
-      }
+        if (confirmationCode !== (await client.get(email))) {
+          return msg(
+            res,
+            "The confirmation code you entered is incorrect. Please try again.",
+            400
+          );
+        }
+      } 
+      let pass:string = process.env.SECRET_KEY as string;
+        const user: any = new Users({
+          fullName,
+          email,
+          password: sha256(password || pass),
+        });
+        await user.save();
+        client.set(email, "");
 
-      if (confirmationCode !== (await client.get(email))) {
-        return msg(
-          res,
-          "The confirmation code you entered is incorrect. Please try again.",
-          400
-        );
-      }
-
-      const user:any = new Users({
-        fullName,
-        email,
-        role,
-        password: sha256(password),
-      });
-      await user.save();
-      client.set(email, "");
-
-      res.status(201).json({
-        token: JWT.SIGN({
-          id: user._id,
-        }),
-        data: user,
-      });
+        res.status(201).json({
+          token: JWT.SIGN({
+            id: user._id,
+          }),
+          data: user,
+        });
+     
     } catch (error: any) {
       err(res, error.message, 500);
     }
   },
-  async get(req: Request, res: Response) {
+  async getAll(req: Request, res: Response) {
+    try {
+      const user = await Users.find()
+        .populate("education")
+        .populate("resume")
+        .populate("experience")
+        .populate("roleAndSalary")
+        .populate("skills")
+        .populate("lang");
+
+      if (!user) {
+        return res.status(404).json({ message: "Users not found" });
+      }
+      return res.status(200).json(user);
+    } catch (err) {
+      console.error("Error fetching user:", err);
+      res
+        .status(500)
+        .json({ message: "An error occurred while fetching the user" });
+    }
+  },
+  async getOne(req: Request, res: Response) {
     try {
       const token = req.headers.token as string;
       const userId = JWT.VERIFY(token).id;
@@ -78,13 +100,12 @@ export default {
         .populate("roleAndSalary")
         .populate("skills")
         .populate("lang");
- 
+
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
       return res.status(200).json(user);
-    } catch (err) { 
-
+    } catch (err) {
       console.error("Error fetching user:", err);
       res
         .status(500)
@@ -96,7 +117,7 @@ export default {
       let { userEmail: email, password } = req.body;
       let user: any = await Users.findOne({
         email,
-        password: sha256(password),
+        password: sha256(password||process.env.SECRET_KEY),
       });
       if (!user) {
         return err(res, "Email or password wrong!", 400);
@@ -115,8 +136,8 @@ export default {
     try {
       let token = req.headers.token as string;
       const id = JWT.VERIFY(token).id;
-    let reqFiles =req.files as any
-     
+      let reqFiles = req.files as any;
+
       if (req.files && reqFiles) {
         const profilePicture: any = reqFiles.profilePicture;
         const allowedExtensions = [".jpg", ".jpeg", ".png"];
@@ -133,24 +154,20 @@ export default {
         let direction = path.join(process.cwd(), "src", "public", "images");
         const uploadPath = path.join(direction, fileName);
 
-     
-          
-          fs.readdir(direction, (err, file) => {
-            if (file[0] && file[0].split(".")[0] == id) {
-              fs.unlinkSync(direction + "/" + file[0]);
-            }
-          });
-        
+        fs.readdir(direction, (err, file) => {
+          if (file[0] && file[0].split(".")[0] == id) {
+            fs.unlinkSync(direction + "/" + file[0]);
+          }
+        });
+
         setTimeout(() => {
-            
           profilePicture.mv(uploadPath, (err: any) => {
             if (err) {
               return res.status(500).json({ message: err });
             }
           });
-        },3)
-        
-        
+        }, 3);
+
         await Users.findByIdAndUpdate(id, {
           profilePicture: "/images/" + fileName,
         });
@@ -159,6 +176,8 @@ export default {
       const updateData: {
         fullName: any;
         available: any;
+        phoneNumber: any;
+        linkedIn: any;
         nationality: any;
         residence: any;
         aboutyourself: any;
@@ -167,6 +186,8 @@ export default {
         "fullName",
         "available",
         "resume",
+        "linkedIn",
+        "phoneNumber",
         "nationality",
         "residence",
         "aboutyourself",
@@ -210,7 +231,7 @@ export default {
   async delete(req: Request, res: Response) {
     try {
       const token = req.headers.token as string;
-    const userId = JWT.VERIFY(token).id;
+      const userId = JWT.VERIFY(token).id;
       const deletedUser = await Users.findByIdAndDelete(userId);
 
       if (!deletedUser) {
@@ -225,24 +246,22 @@ export default {
     try {
       const token = req.headers.token as string;
       const userId = JWT.VERIFY(token).id;
-      let { jobId } = req.body
+      let { jobId } = req.body;
       if (!jobId) {
-       
         return res.status(400).json({ message: "Invalid data", status: 400 });
-     }
-    let updatedJob= await  jobSchema.findByIdAndUpdate(jobId, {
+      }
+      let updatedJob = await jobSchema.findByIdAndUpdate(jobId, {
         $push: {
           employeies: userId,
         },
-    });
+      });
       if (!updatedJob) {
         return res.status(404).json({ message: "Job not found", status: 404 });
       }
 
       return res.status(201).json("Sucsessfully applied");
-    } catch (error:any) {
-      return res.status(500).json({error:error?.message});
-      
+    } catch (error: any) {
+      return res.status(500).json({ error: error?.message });
     }
-  }
+  },
 };

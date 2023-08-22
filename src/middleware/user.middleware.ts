@@ -8,8 +8,8 @@ import { JWT } from "../utils/jwt.js";
 export default {
   async checkBody(req: Request, res: Response, next: NextFunction) {
     try {
-      const { fullName, userEmail: email, password } = req.body;
-      if (!fullName || !email || !password) {
+      const { fullName, userEmail: email, } = req.body;
+      if (!fullName || !email ) {
         return err(res, "Invalid data", 400);
       }
 
@@ -23,8 +23,7 @@ export default {
 
       let userTest = new Users({
         fullName,
-        email,
-        password,
+        email
       });
       await userTest.save();
 

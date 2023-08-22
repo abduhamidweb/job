@@ -22,8 +22,7 @@ const userSchema = new Schema({
     },
   },
   password: {
-    type: String,
-    required: true,
+    type: String
   },
   profilePicture: {
     type: String,
@@ -115,6 +114,18 @@ const userSchema = new Schema({
         },
       },
     ],
+  },
+  phoneNumber: {
+    type: String,
+  },
+  linkedIn: {
+    type: String,
+    validate: {
+      validator: (value: string) => {
+        return validator.isURL(value)
+      },
+      message: "Invalid URL",
+    },
   },
 });
 
