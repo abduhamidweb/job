@@ -10,6 +10,7 @@ import data from "../Responser/data.js";
 import path from "path";
 import jobSchema from "../schemas/job.schema.js";
 import fs from "fs";
+import { Any } from "telegraf/typings/util.js";
 let { msg, send } = responser;
 
 const client = redis.createClient({
@@ -26,43 +27,43 @@ client.connect();
 export default {
   async post(req: Request, res: Response) {
     try {
-      const {
+      let {
         fullName,
         userEmail: email,
         password,
-        role,
         confirmationCode,
       } = req.body;
+      if (password) {
+        if (!confirmationCode) {
+          const generatedConfirmationCode = await sendConfirmationEmail(email);
+          await client.set(email, generatedConfirmationCode);
+          return msg(res, "Confirmation code sent to the email", 200);
+        }
 
-      if (!confirmationCode) {
-        const generatedConfirmationCode = await sendConfirmationEmail(email);
-        await client.set(email, generatedConfirmationCode);
-        return msg(res, "Confirmation code sent to the email", 200);
-      }
+        if (confirmationCode !== (await client.get(email))) {
+          return msg(
+            res,
+            "The confirmation code you entered is incorrect. Please try again.",
+            400
+          );
+        }
+      } 
+      let pass:string = process.env.SECRET_KEY as string;
+        const user: any = new Users({
+          fullName,
+          email,
+          password: sha256(password || pass),
+        });
+        await user.save();
+        client.set(email, "");
 
-      if (confirmationCode !== (await client.get(email))) {
-        return msg(
-          res,
-          "The confirmation code you entered is incorrect. Please try again.",
-          400
-        );
-      }
-
-      const user: any = new Users({
-        fullName,
-        email,
-        role,
-        password: sha256(password),
-      });
-      await user.save();
-      client.set(email, "");
-
-      res.status(201).json({
-        token: JWT.SIGN({
-          id: user._id,
-        }),
-        data: user,
-      });
+        res.status(201).json({
+          token: JWT.SIGN({
+            id: user._id,
+          }),
+          data: user,
+        });
+     
     } catch (error: any) {
       err(res, error.message, 500);
     }
@@ -116,7 +117,7 @@ export default {
       let { userEmail: email, password } = req.body;
       let user: any = await Users.findOne({
         email,
-        password: sha256(password),
+        password: sha256(password||process.env.SECRET_KEY),
       });
       if (!user) {
         return err(res, "Email or password wrong!", 400);
