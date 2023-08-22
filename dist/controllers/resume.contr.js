@@ -26,7 +26,7 @@ export class ResumeController {
                 if (!user)
                     return res.status(404).send({ message: "User not found" });
                 if (!req.files || Object.keys(req.files).length === 0) {
-                    return res.status(400).send('No files were uploaded.');
+                    return res.status(400).send('No files were uploaded..');
                 }
                 // create a new resume
                 const resumeFiles = Array.isArray(req.files) ? req.files : [req.files];
