@@ -12,7 +12,7 @@ export class ResumeController {
     async createResume(req: Request, res: Response) {
         try { 
             let token = req.headers.token;
-            if (!token) return res.status(401).send({ message: 'Invalid token' });
+            if (!token) return res.status(401).send({ message: 'Invalid token' }); 
             let userId = JWT.VERIFY(token as string).id
             let user = await userSchema.findById(userId);
             if (!user) return res.status(404).send({ message: "User not found" });
