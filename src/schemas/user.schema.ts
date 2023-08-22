@@ -116,6 +116,18 @@ const userSchema = new Schema({
       },
     ],
   },
+  phoneNumber: {
+    type: String,
+  },
+  linkedIn: {
+    type: String,
+    validate: {
+      validator: (value: string) => {
+        return validator.isURL(value)
+      },
+      message: "Invalid URL",
+    },
+  },
 });
 
 function isBoolean(value: boolean): boolean {
