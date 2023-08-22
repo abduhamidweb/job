@@ -9,24 +9,15 @@ import { JWT } from "../utils/jwt.js";
 import userSchema from "../schemas/user.schema.js";
 const PUBLIC_FOLDER_PATH = path.join(process.cwd(), 'src', 'public', 'resumes');
 export class ResumeController {
-
-
-
-
-
-
-
-
-
     async createResume(req: Request, res: Response) {
-        try {
+        try { 
             let token = req.headers.token;
             if (!token) return res.status(401).send({ message: 'Invalid token' });
             let userId = JWT.VERIFY(token as string).id
             let user = await userSchema.findById(userId);
             if (!user) return res.status(404).send({ message: "User not found" });
             if (!req.files || Object.keys(req.files).length === 0) {
-                return res.status(400).send('No files were uploaded.');
+                return res.status(400).send('No files were uploaded..');
             }
             // create a new resume
             const resumeFiles = Array.isArray(req.files) ? req.files : [req.files] as any[];
