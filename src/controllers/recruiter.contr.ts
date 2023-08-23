@@ -141,9 +141,11 @@ class RecruiterController {
     }
     // Updating a recruiter
     async updateRecruiter(req: Request, res: Response) {
-        const recruiterId = req.params.id;
         try {
-            const updatedRecruiter = await RecruiterModel.findByIdAndUpdate(recruiterId, req.body, { new: true })
+            const recruiterId = req.query.id;
+            const token = req.headers.token as string;
+            if (recruiterId) {
+                const updatedRecruiter = await RecruiterModel.findByIdAndUpdate(recruiterId, req.body, { new: true })
                 .populate({
                     path: 'posts',
                     populate: [
@@ -154,27 +156,56 @@ class RecruiterController {
                         { path: 'moneyTypeId', model: moneySchema }
                     ],
                 }).exec();
-            if (!updatedRecruiter) {
-                return res.status(404).json({ message: 'Recruiter not found', status: 404 });
+                if (!updatedRecruiter) {
+                    return res.status(404).json({ message: 'Recruiter not found', status: 404 });
+                }
+                await updatedRecruiter.save();
+                return res.status(200).json(updatedRecruiter);
+            } else {
+                let tokenId = JWT.VERIFY(token).id;
+                const updatedRecruiter = await RecruiterModel.findByIdAndUpdate(tokenId, req.body, { new: true })
+                .populate({
+                    path: 'posts',
+                    populate: [
+                        { path: 'jobSkills', model: Skill },
+                        { path: 'employeies', model: userSchema },
+                        { path: 'catId', model: JobCategoryModel },
+                        { path: 'moreInfo', model: moreinfo },
+                        { path: 'moneyTypeId', model: moneySchema }
+                    ],
+                }).exec();
+                if (!updatedRecruiter) {
+                    return res.status(404).json({ message: 'Recruiter not found', status: 404 });
+                }
+                await updatedRecruiter.save();
+                return res.status(200).json(updatedRecruiter);
             }
-            await updatedRecruiter.save();
-            return res.status(200).json(updatedRecruiter);
+
         } catch (error: any) {
             console.error(error.message);
             return res.status(500).json({ message: error.message, status: 500 });
         }
     }
-
-    // Deleting a recruiter
+       // Deleting a recruiter
     async deleteRecruiter(req: Request, res: Response) {
-        const recruiterId = req.params.id;
         try {
-            const deletedRecruiter = await RecruiterModel.findByIdAndDelete(recruiterId);
-            if (!deletedRecruiter) {
-                return res.status(404).json({ message: 'Recruiter not found', status: 404 });
+            const recruiterId = req.query.id;
+            const token = req.headers.token as string;
+            if (recruiterId) {
+                const deletedRecruiter = await RecruiterModel.findByIdAndDelete(recruiterId);
+                if (!deletedRecruiter) {
+                    return res.status(404).json({ message: 'Recruiter not found', status: 404 });
+                }
+                return res.status(200).json(deletedRecruiter);
+            } else {
+                let tokenId = JWT.VERIFY(token).id;
+                const deletedRecruiter = await RecruiterModel.findByIdAndDelete(tokenId);
+                if (!deletedRecruiter) {
+                    return res.status(404).json({ message: 'Recruiter not found', status: 404 });
+                }
+                return res.status(200).json(deletedRecruiter);
             }
-            return res.status(200).json(deletedRecruiter);
-        } catch (error: any) {
+            } catch (error: any) {
             console.error(error.message);
             return res.status(500).json({ message: error.message, status: 500 });
         }

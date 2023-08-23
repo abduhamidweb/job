@@ -161,24 +161,46 @@ class RecruiterController {
     // Updating a recruiter
     updateRecruiter(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const recruiterId = req.params.id;
             try {
-                const updatedRecruiter = yield RecruiterModel.findByIdAndUpdate(recruiterId, req.body, { new: true })
-                    .populate({
-                    path: 'posts',
-                    populate: [
-                        { path: 'jobSkills', model: Skill },
-                        { path: 'employeies', model: userSchema },
-                        { path: 'catId', model: JobCategoryModel },
-                        { path: 'moreInfo', model: moreinfo },
-                        { path: 'moneyTypeId', model: moneySchema }
-                    ],
-                }).exec();
-                if (!updatedRecruiter) {
-                    return res.status(404).json({ message: 'Recruiter not found', status: 404 });
+                const recruiterId = req.query.id;
+                const token = req.headers.token;
+                if (recruiterId) {
+                    const updatedRecruiter = yield RecruiterModel.findByIdAndUpdate(recruiterId, req.body, { new: true })
+                        .populate({
+                        path: 'posts',
+                        populate: [
+                            { path: 'jobSkills', model: Skill },
+                            { path: 'employeies', model: userSchema },
+                            { path: 'catId', model: JobCategoryModel },
+                            { path: 'moreInfo', model: moreinfo },
+                            { path: 'moneyTypeId', model: moneySchema }
+                        ],
+                    }).exec();
+                    if (!updatedRecruiter) {
+                        return res.status(404).json({ message: 'Recruiter not found', status: 404 });
+                    }
+                    yield updatedRecruiter.save();
+                    return res.status(200).json(updatedRecruiter);
                 }
-                yield updatedRecruiter.save();
-                return res.status(200).json(updatedRecruiter);
+                else {
+                    let tokenId = JWT.VERIFY(token).id;
+                    const updatedRecruiter = yield RecruiterModel.findByIdAndUpdate(tokenId, req.body, { new: true })
+                        .populate({
+                        path: 'posts',
+                        populate: [
+                            { path: 'jobSkills', model: Skill },
+                            { path: 'employeies', model: userSchema },
+                            { path: 'catId', model: JobCategoryModel },
+                            { path: 'moreInfo', model: moreinfo },
+                            { path: 'moneyTypeId', model: moneySchema }
+                        ],
+                    }).exec();
+                    if (!updatedRecruiter) {
+                        return res.status(404).json({ message: 'Recruiter not found', status: 404 });
+                    }
+                    yield updatedRecruiter.save();
+                    return res.status(200).json(updatedRecruiter);
+                }
             }
             catch (error) {
                 console.error(error.message);
@@ -189,13 +211,24 @@ class RecruiterController {
     // Deleting a recruiter
     deleteRecruiter(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const recruiterId = req.params.id;
             try {
-                const deletedRecruiter = yield RecruiterModel.findByIdAndDelete(recruiterId);
-                if (!deletedRecruiter) {
-                    return res.status(404).json({ message: 'Recruiter not found', status: 404 });
+                const recruiterId = req.query.id;
+                const token = req.headers.token;
+                if (recruiterId) {
+                    const deletedRecruiter = yield RecruiterModel.findByIdAndDelete(recruiterId);
+                    if (!deletedRecruiter) {
+                        return res.status(404).json({ message: 'Recruiter not found', status: 404 });
+                    }
+                    return res.status(200).json(deletedRecruiter);
                 }
-                return res.status(200).json(deletedRecruiter);
+                else {
+                    let tokenId = JWT.VERIFY(token).id;
+                    const deletedRecruiter = yield RecruiterModel.findByIdAndDelete(tokenId);
+                    if (!deletedRecruiter) {
+                        return res.status(404).json({ message: 'Recruiter not found', status: 404 });
+                    }
+                    return res.status(200).json(deletedRecruiter);
+                }
             }
             catch (error) {
                 console.error(error.message);
