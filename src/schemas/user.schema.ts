@@ -40,18 +40,18 @@ const userSchema = new Schema({
   },
   nationality: {
     type: String,
-    enum: {
-      values: countries.all.map((e) => e.name),
-      message: "Invalid nation selected",
-    },
+    // enum: {
+    //   values: countries.all.map((e) => e.name),
+    //   message: "Invalid nation selected",
+    // },
     required: false,
   },
   residence: {
     type: String,
-    enum: {
-      values: countries.all.map((e) => e.name),
-      message: "Invalid country selected",
-    },
+    // enum: {
+    //   values: countries.all.map((e) => e.name),
+    //   message: "Invalid country selected",
+    // },
     required: false,
   },
   aboutyourself: {
