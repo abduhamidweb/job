@@ -12,36 +12,6 @@ import userModel from "../schemas/user.schema.js";
 import { JWT } from "../utils/jwt.js";
 import userSchema from "../schemas/user.schema.js";
 class RoleAndSalaryController {
-    postRoleAndSalary(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const token = req.headers.token;
-                let userId = JWT.VERIFY(token).id;
-                const { preferredRole, monthlySalary, expectedSalary } = req.body;
-                if (!userId) {
-                    const errorMessage = 'userId kiritilmagan';
-                    res.status(400).json({ message: errorMessage, status: 400 });
-                    return;
-                }
-                const user = yield userModel.findById(userId);
-                if (!user) {
-                    const errorMessage = 'Bunday User Topilmadi';
-                    console.error(errorMessage);
-                    res.status(404).json({ message: errorMessage, status: 404 });
-                    return;
-                }
-                const RoleAndSalaryPost = new RoleAndSalary({ preferredRole, monthlySalary, expectedSalary, userId });
-                yield RoleAndSalaryPost.save();
-                yield userSchema.findByIdAndUpdate(userId, {
-                    roleAndSalary: RoleAndSalaryPost._id,
-                });
-                res.status(201).json("Successfully created Role and Salary");
-            }
-            catch (error) {
-                res.status(500).json({ error: error.message });
-            }
-        });
-    }
     getAllRoleAndSalary(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -55,29 +25,34 @@ class RoleAndSalaryController {
     }
     updateRoleAndSalary(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            const { preferredRole, monthlySalary, expectedSalary } = req.body;
             try {
-                const roleAndSalaryPut = yield RoleAndSalary.findByIdAndUpdate(id, { preferredRole, monthlySalary, expectedSalary }, { new: true });
+                const token = req.headers.token;
+                let userId = JWT.VERIFY(token).id;
+                const { preferredRole, monthlySalary, expectedSalary } = req.body;
+                if (!userId) {
+                    const errorMessage = "Bunday user IDlik malumot topilmadi";
+                    res.status(400).json({ message: errorMessage, status: 400 });
+                    return;
+                }
+                const user = yield userModel.findById(userId);
+                if (!user) {
+                    const errorMessage = "Bunday User Topilmadi";
+                    console.error(errorMessage);
+                    res.status(404).json({ message: errorMessage, status: 404 });
+                    return;
+                }
+                const roleAndSalaryPut = yield RoleAndSalary.findOneAndUpdate({ userId }, { preferredRole, monthlySalary, expectedSalary }, { new: true });
                 if (!roleAndSalaryPut) {
-                    res.status(404).json({ error: 'Role and Salary not found' });
+                    const RoleAndSalaryPost = new RoleAndSalary({ preferredRole, monthlySalary, expectedSalary, userId });
+                    yield RoleAndSalaryPost.save();
+                    yield userSchema.findByIdAndUpdate(userId, {
+                        roleAndSalary: RoleAndSalaryPost._id,
+                    });
+                    res.status(201).json("Successfully created Role and Salary");
                 }
-                res.status(200).send("Role and Salary succesfully edited");
-            }
-            catch (error) {
-                res.status(500).json({ error: error.message });
-            }
-        });
-    }
-    deleteRoleAndSalary(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { id } = req.params;
-            try {
-                const roleAndSalary = yield RoleAndSalary.findByIdAndDelete(id);
-                if (!roleAndSalary) {
-                    res.status(404).json({ error: 'Role and Salary not found' });
+                else {
+                    res.status(200).json("Role and Salary succesfully edited");
                 }
-                res.status(200).send("Role and Salary succesfully deleted");
             }
             catch (error) {
                 res.status(500).json({ error: error.message });
