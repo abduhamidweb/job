@@ -10,7 +10,6 @@ class ExperienceController {
   public async getAllExperience(req: Request, res: Response): Promise<void> {
     try {
       const experiences: IExperience[] | null = await Experiences.find();
-
       res.status(200).json(experiences);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
