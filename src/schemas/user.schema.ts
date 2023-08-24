@@ -5,7 +5,7 @@ import { countries } from "country-data-list";
 
 
 
-const userSchema = new Schema({
+const userSchema:any = new Schema({
   fullName: {
     type: String,
     required: [true, "Name is required"],

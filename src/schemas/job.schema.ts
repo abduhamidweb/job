@@ -27,7 +27,6 @@ const FileDataSchema = new Schema<IFileData>({
     },
     jobSave: {
         type: Boolean,
-        required: true,
     },
     jobTitle: {
         type: String,
@@ -49,7 +48,6 @@ const FileDataSchema = new Schema<IFileData>({
     },
     jobCooperate: {
         type: Boolean,
-        required: true,
     },
     jobPrice: {
         type: Number,
@@ -67,7 +65,6 @@ const FileDataSchema = new Schema<IFileData>({
     catId: {
         type: String,
         ref: "JobCategory",
-        required: true,
     },
     moneyTypeId: {
         type: Schema.Types.ObjectId,
