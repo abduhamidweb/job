@@ -9,8 +9,8 @@ export interface IEducation extends Document {
     name: string;
     degree: string;
     fieldOfStudy: string;
-    startDate: Date;
-    endDate: Date;
+    startDate: string;
+    endDate: string;
 }
 export interface IRecruiter extends Document {
     email: string;
