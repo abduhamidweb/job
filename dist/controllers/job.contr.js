@@ -47,10 +47,10 @@ class FileDataController {
                         data: user
                     });
                 const { catId } = fileData;
-                if (!catId) {
-                    const errorMessage = 'catId kiritilmagan';
-                    return res.status(400).json({ message: errorMessage, status: 400 });
-                }
+                // if (!catId) {
+                //     const errorMessage = 'catId kiritilmagan';
+                //     return res.status(400).json({ message: errorMessage, status: 400 });
+                // }
                 const jobCategory = yield JobCategoryModel.findById(catId);
                 if (!jobCategory) {
                     const errorMessage = 'Job kategoriyasi topilmadi';

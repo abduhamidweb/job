@@ -15,11 +15,11 @@ const educationSchema = new Schema({
         required: [true, "Field of study is required"],
     },
     startDate: {
-        type: Date,
+        type: String,
         required: [true, "Start date is required"],
     },
     endDate: {
-        type: Date,
+        type: String,
         required: [true, "End date is required"],
     },
 });
