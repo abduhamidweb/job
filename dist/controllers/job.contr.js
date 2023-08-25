@@ -22,6 +22,7 @@ import FileDataModel from '../schemas/job.schema.js';
 import JobCategoryModel from '../schemas/jobCategory.schema.js';
 import { JWT } from '../utils/jwt.js';
 import recRuiterSchema from '../schemas/recruiter.schema.js';
+import Recruiter from '../schemas/recruiter.schema.js';
 class FileDataController {
     // FileData yaratish
     createFileData(req, res, next) {
@@ -72,8 +73,16 @@ class FileDataController {
     getAllFileData(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const fileDataList = yield FileDataModel.find().populate('jobSkills jobEmployee moneyTypeId catId');
-                return res.status(200).json(fileDataList);
+                const token = req.headers.token;
+                let userId = JWT.VERIFY(token).id;
+                if (userId) {
+                    const oneRecruiterJobs = yield Recruiter.findById(userId).populate('posts');
+                    return res.status(200).json(oneRecruiterJobs);
+                }
+                else {
+                    const fileDataList = yield FileDataModel.find().populate('jobSkills jobEmployee moneyTypeId catId');
+                    return res.status(200).json(fileDataList);
+                }
             }
             catch (error) {
                 console.error(error.message);
@@ -86,7 +95,26 @@ class FileDataController {
         return __awaiter(this, void 0, void 0, function* () {
             const fileId = req.params.id;
             try {
-                const fileData = yield FileDataModel.findById(fileId).populate('jobSkills jobEmployee moreInfo moneyTypeId catId employeies');
+                const fileData = yield FileDataModel.findById(fileId)
+                    .populate('jobSkills jobEmployee moreInfo moneyTypeId catId employeies');
+                if (!fileData) {
+                    return res.status(404).json({ message: 'FileData topilmadi', status: 404 });
+                }
+                return res.status(200).json(fileData);
+            }
+            catch (error) {
+                console.error(error.message);
+                return res.status(500).json({ message: error.message, status: 500 });
+            }
+        });
+    }
+    getFileDataByToken(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const token = req.headers.token;
+                let fileId = JWT.VERIFY(token).id;
+                const fileData = yield FileDataModel.findById(fileId)
+                    .populate('jobSkills jobEmployee moreInfo moneyTypeId catId employeies');
                 if (!fileData) {
                     return res.status(404).json({ message: 'FileData topilmadi', status: 404 });
                 }
