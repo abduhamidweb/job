@@ -36,12 +36,12 @@ const FileDataSchema = new Schema<IFileData>({
         type: String,
         required: true,
     },
-    jobSkills: [
+    jobSkills: 
         {
             type: Schema.Types.ObjectId,
             ref: 'Skills',
         },
-    ],
+   
     jobType: {
         type: String,
         required: true,

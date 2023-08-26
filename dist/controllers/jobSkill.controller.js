@@ -8,40 +8,35 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import Skills from "../schemas/jobSkill.schema.js";
-import JobModel from "../schemas/job.schema.js";
 class SkillController {
-    postSkill(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { skillName, jobId } = req.body;
-            try {
-                if (!jobId) {
-                    const errorMessage = 'jobId kiritilmagan';
-                    res.status(400).json({ message: errorMessage, status: 400 });
-                    return;
-                }
-                const job = yield JobModel.findById(jobId);
-                if (!job) {
-                    const errorMessage = 'Job kategoriyasi topilmadi';
-                    console.error(errorMessage);
-                    res.status(404).json({ message: errorMessage, status: 404 });
-                    return;
-                }
-                const skill = new Skills({ skillName, jobId });
-                yield skill.save();
-                if (job.jobSkills) {
-                    job.jobSkills.push(skill._id);
-                }
-                else {
-                    job.jobSkills = [skill._id];
-                }
-                yield job.save();
-                res.status(201).json("Successfully created Skill");
-            }
-            catch (error) {
-                res.status(500).json({ error: error.message });
-            }
-        });
-    }
+    // public async postSkill(req: Request, res: Response): Promise<void> {
+    // const { skillName, jobId }: IJobSkills = req.body;
+    // try {
+    // if (!jobId) {
+    // const errorMessage = 'jobId kiritilmagan';
+    // res.status(400).json({ message: errorMessage, status: 400 });
+    // return;
+    // }
+    // const job = await JobModel.findById(jobId);
+    // if (!job) {
+    // const errorMessage = 'Job kategoriyasi topilmadi';
+    // console.error(errorMessage);
+    // res.status(404).json({ message: errorMessage, status: 404 });
+    // return;
+    // }
+    // const skill = new Skills({ skillName, jobId });
+    // await skill.save();
+    // if (job.jobSkills) {
+    // 
+    // } else {
+    // job.jobSkills = [skill._id];
+    // }
+    // await job.save();
+    // res.status(201).json("Successfully created Skill");
+    // } catch (error: any) {
+    // res.status(500).json({ error: error.message });
+    // }
+    // }
     getAllSkills(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

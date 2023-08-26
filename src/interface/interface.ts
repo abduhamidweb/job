@@ -30,7 +30,7 @@ export interface IFileData extends Document {
     jobSave: boolean;
     jobTitle: string;
     jobInfo: string;
-    jobSkills: Types.ObjectId[]; // ObjectId lar uchun ref
+    jobSkills: Types.ObjectId; // ObjectId lar uchun ref
     jobType: string;
     jobCooperate: boolean;
     jobPrice: number;

@@ -23,13 +23,15 @@ import JobCategoryModel from '../schemas/jobCategory.schema.js';
 import { JWT } from '../utils/jwt.js';
 import recRuiterSchema from '../schemas/recruiter.schema.js';
 import Recruiter from '../schemas/recruiter.schema.js';
+import Skills from '../schemas/jobSkill.schema.js';
+import moneySchema from '../schemas/money.schema.js';
+import infoSchema from '../schemas/info.schema.js';
 class FileDataController {
     // FileData yaratish
     createFileData(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const fileData = req.body;
-                const newFileData = yield FileDataModel.create(fileData);
+                // check token;
                 let token = req.headers.token;
                 let userId = JWT.VERIFY(token).id;
                 if (!userId)
@@ -37,6 +39,39 @@ class FileDataController {
                         message: "Invalid token",
                         data: userId
                     });
+                // get body
+                let { comImg, comName, comLocation, jobSave, jobTitle, jobInfo, jobType, jobCooperate, jobPrice, catId, 
+                // job skils,
+                jobskills, 
+                // money pul birligi
+                typeMoney, 
+                // more info
+                moreInfo, } = req.body;
+                jobskills = jobskills[0].split(",");
+                // create job;
+                const newFileData = yield FileDataModel.create({
+                    comImg,
+                    comName,
+                    comLocation,
+                    jobSave,
+                    jobTitle,
+                    jobInfo,
+                    jobType,
+                    jobCooperate,
+                    jobPrice,
+                    catId,
+                });
+                yield newFileData.save();
+                // category add
+                const jobCategory = yield JobCategoryModel.findById(catId);
+                if (!jobCategory) {
+                    const errorMessage = 'Job kategoriyasi topilmadi';
+                    console.error(errorMessage);
+                    return res.status(404).json({ message: errorMessage, status: 404 });
+                }
+                jobCategory.jobs.push(newFileData._id);
+                yield jobCategory.save();
+                // change user    
                 let user = yield recRuiterSchema.findByIdAndUpdate(userId, {
                     $push: {
                         posts: newFileData._id
@@ -47,21 +82,50 @@ class FileDataController {
                         message: "User not found",
                         data: user
                     });
-                const { catId } = fileData;
-                // if (!catId) {
-                //     const errorMessage = 'catId kiritilmagan';
-                //     return res.status(400).json({ message: errorMessage, status: 400 });
-                // }
-                const jobCategory = yield JobCategoryModel.findById(catId);
-                if (!jobCategory) {
-                    const errorMessage = 'Job kategoriyasi topilmadi';
-                    console.error(errorMessage);
-                    return res.status(404).json({ message: errorMessage, status: 404 });
-                }
-                jobCategory.jobs.push(newFileData._id);
-                yield jobCategory.save();
                 yield (user === null || user === void 0 ? void 0 : user.save());
-                return res.status(201).json(newFileData);
+                // add skils
+                if (jobskills) {
+                    let jobSkills = yield Skills.create({
+                        skillName: jobskills,
+                        jobId: newFileData._id
+                    });
+                    yield jobSkills.save();
+                    let jobskillupdate = yield FileDataModel.findByIdAndUpdate(newFileData, {
+                        jobSkills: jobSkills._id
+                    });
+                    yield (jobskillupdate === null || jobskillupdate === void 0 ? void 0 : jobskillupdate.save());
+                }
+                // add pull add
+                if (typeMoney) {
+                    let moneyType = yield moneySchema.create({
+                        moneyType: typeMoney,
+                        job_id: newFileData._id
+                    });
+                    yield moneyType.save();
+                    let jobmoneyTypeupdate = yield FileDataModel.findByIdAndUpdate(newFileData, {
+                        moneyTypeId: moneyType._id
+                    });
+                    yield (jobmoneyTypeupdate === null || jobmoneyTypeupdate === void 0 ? void 0 : jobmoneyTypeupdate.save());
+                }
+                // add more info;
+                if (moreInfo) {
+                    let createInfo = yield infoSchema.create({
+                        jobText: moreInfo,
+                        job_id: newFileData._id
+                    });
+                    yield createInfo.save();
+                    let jobInfoupdate = yield FileDataModel.findByIdAndUpdate(newFileData, {
+                        $push: {
+                            moreInfo: createInfo._id
+                        }
+                    });
+                    yield (jobInfoupdate === null || jobInfoupdate === void 0 ? void 0 : jobInfoupdate.save());
+                }
+                //  save user;
+                return res.status(201).send({
+                    success: true,
+                    data: newFileData
+                });
             }
             catch (error) {
                 console.error(error.message);
