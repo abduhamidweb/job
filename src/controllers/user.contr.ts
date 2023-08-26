@@ -76,7 +76,8 @@ export default {
         .populate("experience")
         .populate("roleAndSalary")
         .populate("skills")
-        .populate("lang");
+        .populate("lang")
+        .populate("workExperience");
 
       if (!user) {
         return res.status(404).json({ message: "Users not found" });
@@ -99,7 +100,8 @@ export default {
         .populate("experience")
         .populate("roleAndSalary")
         .populate("skills")
-        .populate("lang");
+        .populate("lang")
+        .populate("workExperience");
 
       if (!user) {
         return res.status(404).json({ message: "User not found" });

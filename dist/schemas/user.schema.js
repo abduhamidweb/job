@@ -18,7 +18,7 @@ const userSchema = new Schema({
         },
     },
     password: {
-        type: String
+        type: String,
     },
     profilePicture: {
         type: String,
@@ -50,6 +50,14 @@ const userSchema = new Schema({
     experience: {
         ref: "Experience",
         type: mongoose.Types.ObjectId,
+    },
+    workExperience: {
+        type: [
+            {
+                ref: "workExperience",
+                type: mongoose.Types.ObjectId,
+            },
+        ],
     },
     education: {
         type: [
