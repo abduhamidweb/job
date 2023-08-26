@@ -38,7 +38,6 @@ class FileDataController {
                 // more info
                 moreInfo,
             } = req.body;
-            jobskills = jobskills[0].split(",")
             // create job;
             const newFileData = await FileDataModel.create({
                 comImg,
