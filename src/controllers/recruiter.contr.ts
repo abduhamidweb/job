@@ -90,7 +90,6 @@ class RecruiterController {
             return res.status(500).json({ message: error.message, status: 500 });
         }
     }
-
     // Getting a recruiter by ID
     async getRecruiterById(req: Request, res: Response) {
         const recruiterId = req.params.id;

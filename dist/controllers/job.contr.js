@@ -47,7 +47,6 @@ class FileDataController {
                 typeMoney, 
                 // more info
                 moreInfo, } = req.body;
-                jobskills = jobskills[0].split(",");
                 // create job;
                 const newFileData = yield FileDataModel.create({
                     comImg,
