@@ -34,12 +34,10 @@ const FileDataSchema = new Schema({
         type: String,
         required: true,
     },
-    jobSkills: [
-        {
-            type: Schema.Types.ObjectId,
-            ref: 'Skills',
-        },
-    ],
+    jobSkills: {
+        type: Schema.Types.ObjectId,
+        ref: 'Skills',
+    },
     jobType: {
         type: String,
         required: true,

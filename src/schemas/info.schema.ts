@@ -8,7 +8,7 @@ const infoSchema = new Schema(
    },
    job_id : {
     type : Types.ObjectId,
-    ref : 'Jobs'
+    ref : 'FileData'
    },
   },
   {

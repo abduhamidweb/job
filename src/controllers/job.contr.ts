@@ -5,18 +5,64 @@ import JobCategoryModel from '../schemas/jobCategory.schema.js';
 import { JWT } from '../utils/jwt.js';
 import recRuiterSchema from '../schemas/recruiter.schema.js';
 import Recruiter from '../schemas/recruiter.schema.js';
+import Skills from '../schemas/jobSkill.schema.js';
+import moneySchema from '../schemas/money.schema.js';
+import infoSchema from '../schemas/info.schema.js';
 class FileDataController {
     // FileData yaratish
     async createFileData(req: Request, res: Response, next: NextFunction) {
         try {
-            const fileData: IFileData = req.body;
-            const newFileData = await FileDataModel.create(fileData);
-            let token: string | undefined = req.headers.token as string;
+            // check token;
+            let token = req.headers.token as string;
             let userId = JWT.VERIFY(token).id;
             if (!userId) return res.status(401).send({
                 message: "Invalid token",
                 data: userId
-            })
+            });
+            // get body
+            let {
+                comImg,
+                comName,
+                comLocation,
+                jobSave,
+                jobTitle,
+                jobInfo,
+                jobType,
+                jobCooperate,
+                jobPrice,
+                catId,
+                // job skils,
+                jobskills,
+                // money pul birligi
+                typeMoney,
+                // more info
+                moreInfo,
+            } = req.body;
+            jobskills = jobskills[0].split(",")
+            // create job;
+            const newFileData = await FileDataModel.create({
+                comImg,
+                comName,
+                comLocation,
+                jobSave,
+                jobTitle,
+                jobInfo,
+                jobType,
+                jobCooperate,
+                jobPrice,
+                catId,
+            });
+            await newFileData.save();
+            // category add
+            const jobCategory: IJobCategory | null = await JobCategoryModel.findById(catId);
+            if (!jobCategory) {
+                const errorMessage = 'Job kategoriyasi topilmadi';
+                console.error(errorMessage);
+                return res.status(404).json({ message: errorMessage, status: 404 });
+            }
+            jobCategory.jobs.push(newFileData._id);
+            await jobCategory.save();
+            // change user    
             let user = await recRuiterSchema.findByIdAndUpdate(userId, {
                 $push: {
                     posts: newFileData._id
@@ -26,22 +72,54 @@ class FileDataController {
                 message: "User not found",
                 data: user
             })
-            const { catId } = fileData;
-            // if (!catId) {
-            //     const errorMessage = 'catId kiritilmagan';
-            //     return res.status(400).json({ message: errorMessage, status: 400 });
-            // }
-            const jobCategory: IJobCategory | null = await JobCategoryModel.findById(catId);
-            if (!jobCategory) {
-                const errorMessage = 'Job kategoriyasi topilmadi';
-                console.error(errorMessage);
-                return res.status(404).json({ message: errorMessage, status: 404 });
-            }
-
-            jobCategory.jobs.push(newFileData._id);
-            await jobCategory.save();
             await user?.save();
-            return res.status(201).json(newFileData);
+
+            // add skils
+            if (jobskills) {
+
+                let jobSkills = await Skills.create({
+                    skillName: jobskills,
+                    jobId: newFileData._id
+                });
+                await jobSkills.save();
+                let jobskillupdate = await FileDataModel.findByIdAndUpdate(newFileData, {
+                    jobSkills: jobSkills._id
+                })
+                await jobskillupdate?.save();
+            }
+            // add pull add
+            if (typeMoney) {
+
+                let moneyType = await moneySchema.create({
+                    moneyType: typeMoney,
+                    job_id: newFileData._id
+                })
+                await moneyType.save();
+                let jobmoneyTypeupdate = await FileDataModel.findByIdAndUpdate(newFileData, {
+                    moneyTypeId: moneyType._id
+                })
+                await jobmoneyTypeupdate?.save();
+            }
+            // add more info;
+            if (moreInfo) {
+
+                let createInfo = await infoSchema.create({
+                    jobText: moreInfo,
+                    job_id: newFileData._id
+                })
+                await createInfo.save();
+                let jobInfoupdate = await FileDataModel.findByIdAndUpdate(newFileData, {
+                    $push: {
+                        moreInfo: createInfo._id
+                    }
+                })
+                await jobInfoupdate?.save();
+            }
+            //  save user;
+            return res.status(201).send({
+                success: true,
+                data: newFileData
+            });
         } catch (error: any) {
             console.error(error.message);
             return res.status(500).json({ message: error.message, status: 500 });
