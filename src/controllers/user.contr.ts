@@ -11,16 +11,8 @@ import path from "path";
 import jobSchema from "../schemas/job.schema.js";
 import fs from "fs";
 import { Any } from "telegraf/typings/util.js";
+import { client } from "../db/redis.js";
 let { msg, send } = responser;
-
-const client = redis.createClient({
-  url: "redis://default:cWORnYkLiNeTFRVuauwwTN3exTNYLoDi@redis-12791.c291.ap-southeast-2-1.ec2.cloud.redislabs.com:12791",
-});
-client.on("connect", function () {});
-
-client.on("error", function (error) {
-  console.error("Redis serverga bog'lanishda xatolik yuz berdi:", error);
-});
 
 client.connect();
 
