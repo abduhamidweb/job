@@ -70,7 +70,7 @@ const FileDataSchema = new Schema<IFileData>({
         type: Schema.Types.ObjectId,
         ref: 'TypeOfMoney', // "TypeOfMoney" nomli boshqa modelga bog'lanish uchun ref
     },
-});
+},{ timestamps: true });
 // Model yaratish
 const FileDataModel = model<IFileData>('FileData', FileDataSchema);
 
