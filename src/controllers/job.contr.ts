@@ -1,14 +1,106 @@
-import { NextFunction, Request, Response } from 'express';
-import FileDataModel from '../schemas/job.schema.js';
-import { ComLocationData, FileData, IFileData, IJobCategory } from '../interface/interface';
-import JobCategoryModel from '../schemas/jobCategory.schema.js';
 import { JWT } from '../utils/jwt.js';
-import recRuiterSchema from '../schemas/recruiter.schema.js';
-import Recruiter from '../schemas/recruiter.schema.js';
+import IMoreInfo from '../interface/interface';
 import Skills from '../schemas/jobSkill.schema.js';
-import moneySchema from '../schemas/money.schema.js';
 import infoSchema from '../schemas/info.schema.js';
+import Recruiter from '../schemas/recruiter.schema.js';
+import FileDataModel from '../schemas/job.schema.js';
+import { NextFunction, Request, Response } from 'express';
+import moneySchema from '../schemas/money.schema.js';
+import recRuiterSchema from '../schemas/recruiter.schema.js';
+import JobCategoryModel from '../schemas/jobCategory.schema.js';
+import IMoneyType, { ComLocationData, FileData, IFileData, IJobCategory } from '../interface/interface';
 class FileDataController {
+    async updateFileData(req: Request, res: Response) {
+        const fileId = req.params.id;
+        try {
+            const token = req.headers.token as string;
+            const userId = JWT.VERIFY(token).id;
+            if (!userId) {
+                return res.status(401).send({
+                    message: "Invalid token",
+                    data: userId
+                });
+            }
+    
+            const {
+                comImg,
+                comName,
+                comLocation,
+                jobSave,
+                jobTitle,
+                jobInfo,
+                jobType,
+                jobCooperate,
+                jobPrice,
+                catId,
+                jobskillsId,
+                jobskills,
+                typeMoneyId,
+                moreInfoId,
+                moreInfo,
+                typeMoney
+            } = req.body;
+    
+            let updatedFileData: IFileData | null = await FileDataModel.findById(fileId);
+    
+            if (!updatedFileData) {
+                return res.status(404).json({ message: 'Job topilmadi', status: 404 });
+            }
+    
+            const updatedFields: any = {
+                comImg: comImg || updatedFileData.comImg,
+                comName: comName || updatedFileData.comName,
+                comLocation: comLocation || updatedFileData.comLocation,
+                jobSave: jobSave || updatedFileData.jobSave,
+                jobTitle: jobTitle || updatedFileData.jobTitle,
+                jobInfo: jobInfo || updatedFileData.jobInfo,
+                jobType: jobType || updatedFileData.jobType,
+                jobCooperate: jobCooperate || updatedFileData.jobCooperate,
+                jobPrice: jobPrice || updatedFileData.jobPrice,
+                catId: catId || updatedFileData.catId,
+            };
+    
+            updatedFileData = await FileDataModel.findByIdAndUpdate(fileId, updatedFields, { new: true })
+                .populate('jobSkills jobEmployee moreInfo moneyTypeId catId');
+    
+            if (!updatedFileData) {
+                return res.status(404).json({ message: 'Job topilmadi', status: 404 });
+            }
+    
+            if (jobskills && jobskills.length) {
+                const getSkills = await Skills.findById(jobskillsId);
+                if (getSkills) {
+                    getSkills.skillName = jobskills;
+                    await getSkills.save();
+                }
+            }
+    
+            if (typeMoney) {
+                const getMoney = await moneySchema.findById(typeMoneyId);
+                if (getMoney) {
+                    getMoney.moneyType = typeMoney;
+                    await getMoney.save();
+                }
+            }
+    
+            if (moreInfo) {
+                const getMoreInfo = await infoSchema.findById(moreInfoId);
+                if (getMoreInfo) {
+                    getMoreInfo.jobText = moreInfo;
+                    await getMoreInfo.save();
+                }
+            }
+    
+            return res.status(200).send({
+                success: true,
+                data: updatedFileData
+            });
+        } catch (error: any) {
+            console.error(error.message);
+            return res.status(500).json({ message: error.message, status: 500 });
+        }
+    }
+    
     // FileData yaratish
     async createFileData(req: Request, res: Response, next: NextFunction) {
         try {
@@ -67,15 +159,15 @@ class FileDataController {
                     posts: newFileData._id
                 }
             });
-            if (!user) return res.status(404).send({
-                message: "User not found",
-                data: user
-            })
+            if (!user)
+                return res.status(404).send({
+                    message: "User not found",
+                    data: user
+                })
             await user?.save();
 
             // add skils
             if (jobskills) {
-
                 let jobSkills = await Skills.create({
                     skillName: jobskills,
                     jobId: newFileData._id
@@ -124,7 +216,6 @@ class FileDataController {
             return res.status(500).json({ message: error.message, status: 500 });
         }
     }
-
     // Barcha FileData obyektlarini olish
     async getAllFileData(req: Request, res: Response) {
         try {
@@ -142,7 +233,6 @@ class FileDataController {
             return res.status(500).json({ message: error.message, status: 500 });
         }
     }
-
     // FileData obyektini olish
     async getFileDataById(req: Request, res: Response) {
         const fileId = req.params.id;
@@ -232,19 +322,6 @@ class FileDataController {
 
     // okw
     // FileData obyektini tahrirlash
-    async updateFileData(req: Request, res: Response) {
-        const fileId = req.params.id;
-        try {
-            const updatedFileData = await FileDataModel.findByIdAndUpdate(fileId, req.body, { new: true }).populate('jobSkills jobEmployee moreInfo moneyTypeId catId');
-            if (!updatedFileData) {
-                return res.status(404).json({ message: 'FileData topilmadi', status: 404 });
-            }
-            return res.status(200).json(updatedFileData);
-        } catch (error: any) {
-            console.error(error.message);
-            return res.status(500).json({ message: error.message, status: 500 });
-        }
-    }
 
     // FileData obyektini o'chirish
     async deleteFileData(req: Request, res: Response) {
@@ -252,7 +329,7 @@ class FileDataController {
         try {
             const deletedFileData = await FileDataModel.findByIdAndDelete(fileId);
             if (!deletedFileData) {
-                return res.status(404).json({ message: 'FileData topilmadi', status: 404 });
+                return res.status(404).json({ message: 'Job topilmadi', status: 404 });
             }
             return res.status(200).json(deletedFileData);
         } catch (error: any) {

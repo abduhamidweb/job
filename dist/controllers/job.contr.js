@@ -18,15 +18,81 @@ var __rest = (this && this.__rest) || function (s, e) {
         }
     return t;
 };
-import FileDataModel from '../schemas/job.schema.js';
-import JobCategoryModel from '../schemas/jobCategory.schema.js';
 import { JWT } from '../utils/jwt.js';
-import recRuiterSchema from '../schemas/recruiter.schema.js';
-import Recruiter from '../schemas/recruiter.schema.js';
 import Skills from '../schemas/jobSkill.schema.js';
-import moneySchema from '../schemas/money.schema.js';
 import infoSchema from '../schemas/info.schema.js';
+import Recruiter from '../schemas/recruiter.schema.js';
+import FileDataModel from '../schemas/job.schema.js';
+import moneySchema from '../schemas/money.schema.js';
+import recRuiterSchema from '../schemas/recruiter.schema.js';
+import JobCategoryModel from '../schemas/jobCategory.schema.js';
 class FileDataController {
+    updateFileData(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const fileId = req.params.id;
+            try {
+                const token = req.headers.token;
+                const userId = JWT.VERIFY(token).id;
+                if (!userId) {
+                    return res.status(401).send({
+                        message: "Invalid token",
+                        data: userId
+                    });
+                }
+                const { comImg, comName, comLocation, jobSave, jobTitle, jobInfo, jobType, jobCooperate, jobPrice, catId, jobskillsId, jobskills, typeMoneyId, moreInfoId, moreInfo, typeMoney } = req.body;
+                let updatedFileData = yield FileDataModel.findById(fileId);
+                if (!updatedFileData) {
+                    return res.status(404).json({ message: 'Job topilmadi', status: 404 });
+                }
+                const updatedFields = {
+                    comImg: comImg || updatedFileData.comImg,
+                    comName: comName || updatedFileData.comName,
+                    comLocation: comLocation || updatedFileData.comLocation,
+                    jobSave: jobSave || updatedFileData.jobSave,
+                    jobTitle: jobTitle || updatedFileData.jobTitle,
+                    jobInfo: jobInfo || updatedFileData.jobInfo,
+                    jobType: jobType || updatedFileData.jobType,
+                    jobCooperate: jobCooperate || updatedFileData.jobCooperate,
+                    jobPrice: jobPrice || updatedFileData.jobPrice,
+                    catId: catId || updatedFileData.catId,
+                };
+                updatedFileData = yield FileDataModel.findByIdAndUpdate(fileId, updatedFields, { new: true })
+                    .populate('jobSkills jobEmployee moreInfo moneyTypeId catId');
+                if (!updatedFileData) {
+                    return res.status(404).json({ message: 'Job topilmadi', status: 404 });
+                }
+                if (jobskills && jobskills.length) {
+                    const getSkills = yield Skills.findById(jobskillsId);
+                    if (getSkills) {
+                        getSkills.skillName = jobskills;
+                        yield getSkills.save();
+                    }
+                }
+                if (typeMoney) {
+                    const getMoney = yield moneySchema.findById(typeMoneyId);
+                    if (getMoney) {
+                        getMoney.moneyType = typeMoney;
+                        yield getMoney.save();
+                    }
+                }
+                if (moreInfo) {
+                    const getMoreInfo = yield infoSchema.findById(moreInfoId);
+                    if (getMoreInfo) {
+                        getMoreInfo.jobText = moreInfo;
+                        yield getMoreInfo.save();
+                    }
+                }
+                return res.status(200).send({
+                    success: true,
+                    data: updatedFileData
+                });
+            }
+            catch (error) {
+                console.error(error.message);
+                return res.status(500).json({ message: error.message, status: 500 });
+            }
+        });
+    }
     // FileData yaratish
     createFileData(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -244,22 +310,6 @@ class FileDataController {
     }
     // okw
     // FileData obyektini tahrirlash
-    updateFileData(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const fileId = req.params.id;
-            try {
-                const updatedFileData = yield FileDataModel.findByIdAndUpdate(fileId, req.body, { new: true }).populate('jobSkills jobEmployee moreInfo moneyTypeId catId');
-                if (!updatedFileData) {
-                    return res.status(404).json({ message: 'FileData topilmadi', status: 404 });
-                }
-                return res.status(200).json(updatedFileData);
-            }
-            catch (error) {
-                console.error(error.message);
-                return res.status(500).json({ message: error.message, status: 500 });
-            }
-        });
-    }
     // FileData obyektini o'chirish
     deleteFileData(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -267,7 +317,7 @@ class FileDataController {
             try {
                 const deletedFileData = yield FileDataModel.findByIdAndDelete(fileId);
                 if (!deletedFileData) {
-                    return res.status(404).json({ message: 'FileData topilmadi', status: 404 });
+                    return res.status(404).json({ message: 'Job topilmadi', status: 404 });
                 }
                 return res.status(200).json(deletedFileData);
             }

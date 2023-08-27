@@ -39,6 +39,14 @@ export interface IFileData extends Document {
     catId: string;
     moneyTypeId: Types.ObjectId; // ObjectId uchun ref
 }
+export default interface IMoneyType extends Document {
+    jobText: string;
+    job_id: Types.ObjectId;
+}
+export default interface IMoreInfo extends Document {
+    moneyType: string;
+    job_id: Types.ObjectId;
+}
 export interface IJobCategory extends Document {
     jobName: string;
     jobImg: string;
