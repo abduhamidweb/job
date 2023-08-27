@@ -3,9 +3,7 @@ import { isEmailValid } from "../middleware/email.cheker.js";
 import validator from "validator";
 import { countries } from "country-data-list";
 
-
-
-const userSchema:any = new Schema({
+const userSchema: any = new Schema({
   fullName: {
     type: String,
     required: [true, "Name is required"],
@@ -22,7 +20,7 @@ const userSchema:any = new Schema({
     },
   },
   password: {
-    type: String
+    type: String,
   },
   profilePicture: {
     type: String,
@@ -55,6 +53,15 @@ const userSchema:any = new Schema({
     ref: "Experience",
     type: mongoose.Types.ObjectId,
   },
+  workExperience: {
+    type: [
+      {
+        ref: "workExperience",
+        type: mongoose.Types.ObjectId,
+      },
+    ],
+  },
+
   education: {
     type: [
       {
@@ -114,7 +121,7 @@ const userSchema:any = new Schema({
     type: String,
     validate: {
       validator: (value: string) => {
-        return validator.isURL(value)
+        return validator.isURL(value);
       },
       message: "Invalid URL",
     },
