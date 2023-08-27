@@ -26,7 +26,7 @@ export interface IFileData extends Document {
     comImg: string;
     employeies: Types.ObjectId[];
     comName: string;
-    comLocation: string;
+    comLocation?: string;
     jobSave: boolean;
     jobTitle: string;
     jobInfo: string;

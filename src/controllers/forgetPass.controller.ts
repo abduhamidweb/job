@@ -18,9 +18,7 @@ export default {
   async forgetPass(req: Request, res: Response) {
     try {
       let { email, confirmationCode, password } = req.body;
-
       if (!email) return res.status(400).json({ message: "Invalid data" });
-
       let user = await userSchema.findOne({ email });
       if (!user) return res.status(404).json({ message: "User not found" });
 
@@ -33,7 +31,6 @@ export default {
           return res
             .status(400)
             .json({ message: "Confirmation code is wrong." });
-
         return res.json({ message: "ok" });
       } else if (confirmationCode && password) {
         if (confirmationCode !== (await client.get(email)))

@@ -23,7 +23,6 @@ const FileDataSchema = new Schema<IFileData>({
     },
     comLocation: {
         type: String,
-        required: true,
     },
     jobSave: {
         type: Boolean,

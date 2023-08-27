@@ -21,7 +21,6 @@ const FileDataSchema = new Schema({
     },
     comLocation: {
         type: String,
-        required: true,
     },
     jobSave: {
         type: Boolean,
