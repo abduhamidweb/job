@@ -1,30 +1,64 @@
+import bcrypt from "bcrypt";
+import { JWT } from '../utils/jwt.js';
+import { client } from "../db/redis.js";
+import Skill from '../schemas/skill.schema.js';
+import { IRecruiter } from '../interface/interface.js';
+import moreinfo from '../schemas/info.schema.js';
+import userSchema from '../schemas/user.schema.js';
+import moneySchema from '../schemas/money.schema.js';
 import { NextFunction, Request, Response } from 'express';
 import RecruiterModel from '../schemas/recruiter.schema.js'; // Recruiter schema
-import { IRecruiter } from '../interface/interface.js';
-import { JWT } from '../utils/jwt.js';
-import bcrypt from "bcrypt";
-import Skill from '../schemas/skill.schema.js';
-import moreinfo from '../schemas/info.schema.js';
-import moneySchema from '../schemas/money.schema.js';
 import JobCategoryModel from '../schemas/jobCategory.schema.js';
-import userSchema from '../schemas/user.schema.js';
+import { sendConfirmationEmail } from "../utils/nodemailer.js";
 
 class RecruiterController {
     // Creating a new recruiter
     async createRecruiter(req: Request, res: Response, next: NextFunction) {
         try {
-            const recruiterData: IRecruiter = req.body;
+            const {
+                email,
+                companyName,
+                website,
+                location,
+                name,
+                phoneNumber,
+                password,
+                confirmationCode
+            } = req.body;
+            if (!confirmationCode) {
+                const generatedConfirmationCode = await sendConfirmationEmail(email);
+                await client.set(email, generatedConfirmationCode)
+                return res.status(200).json({
+                    success: true,
+                    message: `Code has sent your email. please confirm! ${email}`,
 
+                    confirmationCode: generatedConfirmationCode // Tasdiqlash kodi javob qaytariladi
+                });
+            }
+            if (confirmationCode !== await client.get(email)) {
+                return res.status(400).json({
+                    success: false,
+                    error: "Noto'g'ri tasdiqlash kodi" + confirmationCode
+                });
+            };
             // Parolni hash qilish
-            if (recruiterData.password) {
-                const hashedPassword = await bcrypt.hash(recruiterData.password, 10);
-                recruiterData.password = hashedPassword;
+            if (password) {
+                const hashedPassword = await bcrypt.hash(password, 10);
+                req.body.password = hashedPassword;
             } else {
                 const hashedPassword = await bcrypt.hash(process.env.SECRET_KEY as string, 10);
-                recruiterData.password = hashedPassword;
+                req.body.password = hashedPassword;
             }
             // Hashlangan parolni ma'lumotlar obyektiga qo'shish
-            const newRecruiter = await RecruiterModel.create(recruiterData);
+            const newRecruiter = await RecruiterModel.create({
+                email,
+                companyName,
+                website,
+                location,
+                name,
+                phoneNumber,
+                password: req.body.password
+            });
             await newRecruiter.save();
 
             return res.status(201).send({
@@ -35,7 +69,7 @@ class RecruiterController {
             console.error(error.message);
             return res.status(500).json({ message: error.message, status: 500 });
         }
-    } 
+    }
     async loginRecruiter(req: Request, res: Response, next: NextFunction) {
         try {
             const { email, password } = req.body;
@@ -47,7 +81,7 @@ class RecruiterController {
             if (!existingRecruiter.password) {
                 return res.status(401).json({ message: "Password is not set", status: 401 });
             }
-            
+
             if (password) {
                 const isPasswordValid = await bcrypt.compare(password, existingRecruiter.password);
                 if (!isPasswordValid) {
@@ -127,7 +161,7 @@ class RecruiterController {
                         { path: 'catId', model: JobCategoryModel },
                         { path: 'moreInfo', model: moreinfo },
                         { path: 'moneyTypeId', model: moneySchema }
-                    ], 
+                    ],
                 }).exec();
             if (!recruiter) {
                 return res.status(404).json({ message: 'Recruiter not found', status: 404 });
@@ -145,16 +179,16 @@ class RecruiterController {
             const token = req.headers.token as string;
             if (recruiterId) {
                 const updatedRecruiter = await RecruiterModel.findByIdAndUpdate(recruiterId, req.body, { new: true })
-                .populate({
-                    path: 'posts',
-                    populate: [
-                        { path: 'jobSkills', model: Skill },
-                        { path: 'employeies', model: userSchema },
-                        { path: 'catId', model: JobCategoryModel },
-                        { path: 'moreInfo', model: moreinfo },
-                        { path: 'moneyTypeId', model: moneySchema }
-                    ],
-                }).exec();
+                    .populate({
+                        path: 'posts',
+                        populate: [
+                            { path: 'jobSkills', model: Skill },
+                            { path: 'employeies', model: userSchema },
+                            { path: 'catId', model: JobCategoryModel },
+                            { path: 'moreInfo', model: moreinfo },
+                            { path: 'moneyTypeId', model: moneySchema }
+                        ],
+                    }).exec();
                 if (!updatedRecruiter) {
                     return res.status(404).json({ message: 'Recruiter not found', status: 404 });
                 }
@@ -163,16 +197,16 @@ class RecruiterController {
             } else {
                 let tokenId = JWT.VERIFY(token).id;
                 const updatedRecruiter = await RecruiterModel.findByIdAndUpdate(tokenId, req.body, { new: true })
-                .populate({
-                    path: 'posts',
-                    populate: [
-                        { path: 'jobSkills', model: Skill },
-                        { path: 'employeies', model: userSchema },
-                        { path: 'catId', model: JobCategoryModel },
-                        { path: 'moreInfo', model: moreinfo },
-                        { path: 'moneyTypeId', model: moneySchema }
-                    ],
-                }).exec();
+                    .populate({
+                        path: 'posts',
+                        populate: [
+                            { path: 'jobSkills', model: Skill },
+                            { path: 'employeies', model: userSchema },
+                            { path: 'catId', model: JobCategoryModel },
+                            { path: 'moreInfo', model: moreinfo },
+                            { path: 'moneyTypeId', model: moneySchema }
+                        ],
+                    }).exec();
                 if (!updatedRecruiter) {
                     return res.status(404).json({ message: 'Recruiter not found', status: 404 });
                 }
@@ -185,7 +219,7 @@ class RecruiterController {
             return res.status(500).json({ message: error.message, status: 500 });
         }
     }
-       // Deleting a recruiter
+    // Deleting a recruiter
     async deleteRecruiter(req: Request, res: Response) {
         try {
             const recruiterId = req.query.id;
@@ -204,9 +238,51 @@ class RecruiterController {
                 }
                 return res.status(200).json(deletedRecruiter);
             }
-            } catch (error: any) {
+        } catch (error: any) {
             console.error(error.message);
             return res.status(500).json({ message: error.message, status: 500 });
+        }
+    }
+    async forgetPass(req: Request, res: Response) {
+        try {
+            let { email, confirmationCode, password } = req.body;
+
+            if (!email) return res.status(400).json({ message: "Invalid data" });
+
+            let user = await RecruiterModel.findOne({ email });
+            if (!user) return res.status(404).json({ message: "User not found" });
+
+            if (!confirmationCode) {
+                const generatedConfirmationCode = await sendConfirmationEmail(email);
+                await client.set(email, generatedConfirmationCode);
+                return res.json({
+                    message: "Confirmation code sent to the email!",
+                    confirmationCode: generatedConfirmationCode // Tasdiqlash kodi javob qaytariladi
+
+                });
+            } else if (confirmationCode && !password) {
+                if (confirmationCode !== (await client.get(email)))
+                    return res
+                        .status(400)
+                        .json({ message: "Confirmation code is wrong." });
+                return res.json({ message: "ok" });
+            } else if (confirmationCode && password) {
+                if (confirmationCode !== (await client.get(email)))
+                    return res
+                        .status(400)
+                        .json({ message: "Confirmation code is wrong." });
+                await RecruiterModel.findOneAndUpdate(
+                    { email },
+                    {
+                        password: await bcrypt.hash(password, 10),
+                    }
+                );
+                client.set(email, "");
+                return res
+                    .json({ message: "Password updated" });
+            }
+        } catch (error: any) {
+            return res.status(500).json({ message: error.message });
         }
     }
 }
