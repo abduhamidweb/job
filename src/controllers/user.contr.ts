@@ -14,11 +14,11 @@ import { Any } from "telegraf/typings/util.js";
 import { client } from "../db/redis.js";
 let { msg, send } = responser;
 
-client.connect();
+// client.connect(); 
 
 export default {
   async post(req: Request, res: Response) {
-    try {
+    try { 
       let {
         fullName,
         userEmail: email,
