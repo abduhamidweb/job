@@ -56,12 +56,13 @@ export default {
       const userId = JWT.VERIFY(token).id;
       let user: any = await userSchema
         .findById(userId)
-        .populate("workExperience");
+        .populate({
+          path: "workExperience",
+          populate: { path: "projects" },
+        });
+      
       if (!user) return res.status(403).json({ message: "User not found" });
       let { workExperience } = user;
-      console.log(user);
-      console.log(workExperience);
-
       res.send(workExperience);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
@@ -70,7 +71,9 @@ export default {
   async getOne(req: Request, res: Response) {
     try {
       const workExperienceId = req.params.id;
-      const data = await workExperience.findById(workExperienceId);
+      const data = await workExperience
+        .findById(workExperienceId)
+        .populate("projects");
       res.status(200).json(data);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
@@ -115,7 +118,7 @@ export default {
       }
 
       await workExperience.findByIdAndUpdate(workExperienceId, updateData);
-      let newWE = await workExperience.findByIdAndUpdate(workExperienceId);
+      let newWE = await workExperience.findById(workExperienceId);
 
       await res.json(newWE);
     } catch (error: any) {

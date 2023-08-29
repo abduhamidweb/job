@@ -16,6 +16,7 @@ import { router as roleAndSalaryRouter } from "./role&salary.routes.js";
 import countriesRouter from "./countries.routes.js";
 import WERouter from "./workExperience.routes.js"
 import forgetPassRouter from './forgetPass.routes.js'
+import WPRouter from "./workProjects.routes.js"
 const router = express.Router();
 
 router.use('/test', () => { });
@@ -35,6 +36,7 @@ router.use('/experience', experienceRouter);
 router.use('/roleAndSalary', roleAndSalaryRouter);
 router.use("/get", countriesRouter);
 router.use("/workExperience", WERouter);
+router.use("/workProject", WPRouter);
 router.use("/forgetPass", forgetPassRouter);
 
 
