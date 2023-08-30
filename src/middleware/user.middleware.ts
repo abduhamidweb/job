@@ -48,7 +48,7 @@ export default {
       }
       next();
     } catch (error: any) {
-      err(res, "Server error", 500);
+      err(res, "Invalid token", 400);
     }
   },
   async putChecker(req: Request, res: Response, next: NextFunction) {

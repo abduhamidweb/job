@@ -3,7 +3,7 @@ import Skill from "../schemas/skill.schema.js";
 import userSchema from "../schemas/user.schema.js";
 import { JWT } from "../utils/jwt.js";
 
-export class SkillContr {
+export class SkillContr { 
   static async postSkill(req: Request, res: Response) {
     try {
       const token = req.headers.token as string;

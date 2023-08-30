@@ -53,7 +53,7 @@ export default {
                 next();
             }
             catch (error) {
-                err(res, "Server error", 500);
+                err(res, "Invalid token", 400);
             }
         });
     },

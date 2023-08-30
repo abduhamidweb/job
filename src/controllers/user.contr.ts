@@ -146,7 +146,7 @@ export default {
          let imgPath=await uploader( profilePicture.data,id )
         
 
-        await Users.findByIdAndUpdate(id, {
+        await Users.findByIdAndUpdate(id, { 
           profilePicture:imgPath,
         });
       }
