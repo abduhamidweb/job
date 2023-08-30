@@ -62,10 +62,10 @@ export default {
             try {
                 let id = req.params.id;
                 const { fullName, userEmail: email, password } = req.body;
-                const emailCheck = yield Users.findOne({
+                const emailCheck = email ? yield Users.findOne({
                     email: email,
                     _id: { $ne: id },
-                });
+                }) : null;
                 if (emailCheck) {
                     return err(res, "The email is already taken", 409);
                 }

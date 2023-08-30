@@ -56,12 +56,14 @@ export default {
       let id = req.params.id;
       const { fullName, userEmail: email, password } = req.body;
 
-      const emailCheck: any = await Users.findOne({
-        email: email,
+      const emailCheck: any =email? await Users.findOne({
+        email:email,
         _id: { $ne: id },
-      });
+      }):null;
+    
 
       if (emailCheck) {
+        
         return err(res, "The email is already taken", 409);
       }
 

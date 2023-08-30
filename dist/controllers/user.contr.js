@@ -15,15 +15,15 @@ import { sendConfirmationEmail } from "../utils/nodemailer.js";
 import responser from "../Responser/data.js";
 import path from "path";
 import jobSchema from "../schemas/job.schema.js";
-import fs from "fs";
 import { client } from "../db/redis.js";
+import uploader from "../utils/cloudinary.js";
 let { msg, send } = responser;
-// client.connect(); 
+// client.connect();
 export default {
     post(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let { fullName, userEmail: email, password, confirmationCode, } = req.body;
+                let { fullName, userEmail: email, password, confirmationCode } = req.body;
                 if (password) {
                     if (!confirmationCode) {
                         const generatedConfirmationCode = yield sendConfirmationEmail(email);
@@ -145,23 +145,9 @@ export default {
                             .status(400)
                             .json({ message: "Only JPEG and PNG image files are allowed" });
                     }
-                    const fileName = id + "." + profilePicture.mimetype.split("/")[1];
-                    let direction = path.join(process.cwd(), "src", "public", "images");
-                    const uploadPath = path.join(direction, fileName);
-                    fs.readdir(direction, (err, file) => {
-                        if (file[0] && file[0].split(".")[0] == id) {
-                            fs.unlinkSync(direction + "/" + file[0]);
-                        }
-                    });
-                    setTimeout(() => {
-                        profilePicture.mv(uploadPath, (err) => {
-                            if (err) {
-                                return res.status(500).json({ message: err });
-                            }
-                        });
-                    }, 3);
+                    let imgPath = yield uploader(profilePicture.data, id);
                     yield Users.findByIdAndUpdate(id, {
-                        profilePicture: "/images/" + fileName,
+                        profilePicture: imgPath,
                     });
                 }
                 const updateData = req.body;
