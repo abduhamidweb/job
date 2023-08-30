@@ -1,10 +1,6 @@
-import mongoose, { Schema, model } from "mongoose";
+import { Schema, model } from "mongoose";
 const WESchema = new Schema({
-    companyName: {
-        type: String,
-        required: true,
-    },
-    jobTitle: {
+    projectName: {
         type: String,
         required: true,
     },
@@ -19,9 +15,6 @@ const WESchema = new Schema({
         type: Boolean,
         message: "Working now must be boolean",
     },
-    location: {
-        type: String,
-    },
     description: {
         type: String,
     },
@@ -32,14 +25,6 @@ const WESchema = new Schema({
             },
         ],
     },
-    projects: {
-        type: [
-            {
-                ref: "workProjects",
-                type: mongoose.Types.ObjectId,
-            },
-        ],
-    },
 });
-const workExperience = model("workExperience", WESchema);
-export default workExperience;
+const projects = model("workProjects", WESchema);
+export default projects;

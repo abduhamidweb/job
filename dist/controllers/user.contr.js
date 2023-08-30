@@ -18,7 +18,7 @@ import jobSchema from "../schemas/job.schema.js";
 import fs from "fs";
 import { client } from "../db/redis.js";
 let { msg, send } = responser;
-client.connect();
+// client.connect(); 
 export default {
     post(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -64,7 +64,10 @@ export default {
                     .populate("roleAndSalary")
                     .populate("skills")
                     .populate("lang")
-                    .populate("workExperience");
+                    .populate({
+                    path: "workExperience",
+                    populate: "projects",
+                });
                 if (!user) {
                     return res.status(404).json({ message: "Users not found" });
                 }
