@@ -13,5 +13,5 @@ router.get("/getAll",ICH,getAll);
 router.post("/:id",ICH, IUCH, post);
 router.put("/:id", ICH, put);
 router.delete("/:id", ICH, del);
-
+ 
 export default router;
