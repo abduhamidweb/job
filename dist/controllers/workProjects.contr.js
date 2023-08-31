@@ -7,8 +7,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+import userSchema from "../schemas/user.schema.js";
 import workExperience from "../schemas/workExperience.schema.js";
 import workProject from "../schemas/workProjects.schema.js";
+import { JWT } from "../utils/jwt.js";
 export default {
     post(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -49,6 +51,28 @@ export default {
                 let projectData = yield workProject.findById(projectId);
                 if (!projectData)
                     return res.status(404).json({ message: "Project not found." });
+                return res.status(200).json(projectData);
+            }
+            catch (error) {
+                return res.status(500).json({ message: error.message });
+            }
+        });
+    },
+    getAll(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const token = req.headers.token;
+                const userId = JWT.VERIFY(token).id;
+                let userData = yield userSchema.findById(userId).populate({
+                    path: "workExperience",
+                    populate: {
+                        path: "projects",
+                        model: "workProjects",
+                    },
+                });
+                let projectData = [].concat(...userData.workExperience.map((e) => e.projects));
+                if (!projectData.length)
+                    return res.status(404).json({ message: "Projects not found." });
                 return res.status(200).json(projectData);
             }
             catch (error) {

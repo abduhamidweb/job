@@ -93,7 +93,10 @@ export default {
                     .populate("roleAndSalary")
                     .populate("skills")
                     .populate("lang")
-                    .populate("workExperience");
+                    .populate({
+                    path: "workExperience",
+                    populate: "projects",
+                });
                 if (!user) {
                     return res.status(404).json({ message: "User not found" });
                 }

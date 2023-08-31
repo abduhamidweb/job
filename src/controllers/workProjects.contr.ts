@@ -53,6 +53,28 @@ export default {
       return res.status(500).json({ message: error.message });
     }
   },
+  async getAll(req: Request, res: Response) {
+    try {
+
+      const token = req.headers.token as string;
+      const userId: any = JWT.VERIFY(token).id;
+
+      let userData = await userSchema.findById(userId).populate({
+        path: "workExperience",
+        populate: {
+          path: "projects",
+          model: "workProjects",
+        },
+      });
+      
+      let projectData = [].concat(...userData.workExperience.map((e:any) => e.projects))
+      if (!projectData.length)
+        return res.status(404).json({ message: "Projects not found." });
+      return res.status(200).json(projectData);
+    } catch (error: any) {
+      return res.status(500).json({ message: error.message });
+    }
+  },
   async put(req: Request, res: Response) {
     try {
       let projectId = req.params.id;
@@ -75,7 +97,7 @@ export default {
       await workProject.findByIdAndUpdate(projectId, req.body);
       let projectData = await workProject.findById(projectId);
       console.log(projectId);
-      
+
       res.json(projectData);
     } catch (error: any) {
       return res.status(500).json({ message: error.message });

@@ -42,7 +42,7 @@ export default {
         return err(res, "Invalid id", 400);
       }
       const existingProjectData = await Users.findById(id).exec();
-
+ 
       if (!existingProjectData) {
         return err(res, "User not found", 404);
       }
