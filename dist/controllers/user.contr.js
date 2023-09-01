@@ -18,7 +18,7 @@ import jobSchema from "../schemas/job.schema.js";
 import fs from "fs";
 import { client } from "../db/redis.js";
 let { msg, send } = responser;
-client.connect();
+// client.connect(); 
 export default {
     post(req, res) {
         return __awaiter(this, void 0, void 0, function* () {

@@ -203,8 +203,8 @@ class FileDataController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const token = req.headers.token;
-                let userId = JWT.VERIFY(token).id;
-                if (userId) {
+                if (token) {
+                    let userId = JWT.VERIFY(token).id;
                     const oneRecruiterJobs = yield Recruiter.findById(userId).populate('posts');
                     return res.status(200).json(oneRecruiterJobs);
                 }

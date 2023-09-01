@@ -21,7 +21,7 @@ class FileDataController {
                     data: userId
                 });
             }
-    
+
             const {
                 comImg,
                 comName,
@@ -40,13 +40,13 @@ class FileDataController {
                 moreInfo,
                 typeMoney
             } = req.body;
-    
+
             let updatedFileData: IFileData | null = await FileDataModel.findById(fileId);
-    
+
             if (!updatedFileData) {
                 return res.status(404).json({ message: 'Job topilmadi', status: 404 });
             }
-    
+
             const updatedFields: any = {
                 comImg: comImg || updatedFileData.comImg,
                 comName: comName || updatedFileData.comName,
@@ -59,14 +59,14 @@ class FileDataController {
                 jobPrice: jobPrice || updatedFileData.jobPrice,
                 catId: catId || updatedFileData.catId,
             };
-    
+
             updatedFileData = await FileDataModel.findByIdAndUpdate(fileId, updatedFields, { new: true })
                 .populate('jobSkills jobEmployee moreInfo moneyTypeId catId');
-    
+
             if (!updatedFileData) {
                 return res.status(404).json({ message: 'Job topilmadi', status: 404 });
             }
-    
+
             if (jobskills && jobskills.length) {
                 const getSkills = await Skills.findById(jobskillsId);
                 if (getSkills) {
@@ -74,7 +74,7 @@ class FileDataController {
                     await getSkills.save();
                 }
             }
-    
+
             if (typeMoney) {
                 const getMoney = await moneySchema.findById(typeMoneyId);
                 if (getMoney) {
@@ -82,7 +82,7 @@ class FileDataController {
                     await getMoney.save();
                 }
             }
-    
+
             if (moreInfo) {
                 const getMoreInfo = await infoSchema.findById(moreInfoId);
                 if (getMoreInfo) {
@@ -90,7 +90,7 @@ class FileDataController {
                     await getMoreInfo.save();
                 }
             }
-    
+
             return res.status(200).send({
                 success: true,
                 data: updatedFileData
@@ -100,7 +100,7 @@ class FileDataController {
             return res.status(500).json({ message: error.message, status: 500 });
         }
     }
-    
+
     // FileData yaratish
     async createFileData(req: Request, res: Response, next: NextFunction) {
         try {
@@ -220,8 +220,8 @@ class FileDataController {
     async getAllFileData(req: Request, res: Response) {
         try {
             const token = req.headers.token as string;
-            let userId = JWT.VERIFY(token).id;
-            if (userId) {
+            if (token) {
+                let userId = JWT.VERIFY(token).id;
                 const oneRecruiterJobs = await Recruiter.findById(userId).populate('posts');
                 return res.status(200).json(oneRecruiterJobs);
             } else {
