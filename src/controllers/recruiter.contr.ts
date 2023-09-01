@@ -149,7 +149,7 @@ class RecruiterController {
         }
     }
     async getRecruiterByToken(req: Request, res: Response) {
-        try {
+        try { 
             let token = req.query.token as string;
             let userId = JWT.VERIFY(token as string).id
             const recruiter = await RecruiterModel.findById(userId)
