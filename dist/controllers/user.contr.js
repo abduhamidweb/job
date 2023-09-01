@@ -223,7 +223,7 @@ export default {
                     },
                 });
                 if (!updatedJob) {
-                    return res.status(404).json({ message: "Job not found", status: 404 });
+                    return res.status(404).json({ message: "Job not found ", status: 404 });
                 }
                 return res.status(201).json("Sucsessfully applied");
             }

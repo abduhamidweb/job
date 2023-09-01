@@ -236,8 +236,9 @@ export default {
           employeies: userId,
         },
       });
-      if (!updatedJob) {
-        return res.status(404).json({ message: "Job not found", status: 404 });
+
+      if (!updatedJob ){
+        return res.status(404).json({ message: "Job not found ", status: 404 });
       }
 
       return res.status(201).json("Sucsessfully applied");
