@@ -5,14 +5,13 @@ import authMiddleware from "../middleware/auth.js";
 import workExperienceMd from "../middleware/workExperience.md.js";
 const router = Router();
 
-let { post}=workProjectsContr
-let { getAll, getOne, put, del } = workExperienceController;
+let { post,get,put,del,getAll}=workProjectsContr
+
 let { idAndUserChecker: IUCH, idChecker: ICH } = workExperienceMd;
-
-router.get("/", ICH, getAll);
-router.get("/:id", ICH, IUCH, getOne);
-router.post("/:id", authMiddleware, post);
-router.put("/:id", ICH, IUCH, authMiddleware, put);
-router.delete("/:id", ICH, IUCH, authMiddleware, del);
-
+router.get("/getOne/:id", ICH, get);
+router.get("/getAll",ICH,getAll);
+router.post("/:id",ICH, IUCH, post);
+router.put("/:id", ICH, put);
+router.delete("/:id", ICH, del);
+ 
 export default router;

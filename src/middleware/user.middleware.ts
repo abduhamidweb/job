@@ -42,13 +42,13 @@ export default {
         return err(res, "Invalid id", 400);
       }
       const existingProjectData = await Users.findById(id).exec();
-
+ 
       if (!existingProjectData) {
         return err(res, "User not found", 404);
       }
       next();
     } catch (error: any) {
-      err(res, "Server error", 500);
+      err(res, "Invalid token", 400);
     }
   },
   async putChecker(req: Request, res: Response, next: NextFunction) {
@@ -56,12 +56,14 @@ export default {
       let id = req.params.id;
       const { fullName, userEmail: email, password } = req.body;
 
-      const emailCheck: any = await Users.findOne({
-        email: email,
+      const emailCheck: any =email? await Users.findOne({
+        email:email,
         _id: { $ne: id },
-      });
+      }):null;
+    
 
       if (emailCheck) {
+        
         return err(res, "The email is already taken", 409);
       }
 

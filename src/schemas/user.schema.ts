@@ -89,13 +89,19 @@ const userSchema: any = new Schema({
   skills: {
     type: [
       {
-        ref: "Skill",
-        type: mongoose.Types.ObjectId,
-        validate: {
-          validator: function (value: string) {
-            return mongoose.Types.ObjectId.isValid(value);
+        type: {
+          skill: {
+            type: String,
+            required: true,
           },
-          message: "Invalid skill ID",
+          experience: {
+            type: Number,
+            required: true,
+          },
+          level: {
+            type: String,
+            required: true,
+          },
         },
       },
     ],
@@ -103,13 +109,15 @@ const userSchema: any = new Schema({
   lang: {
     type: [
       {
-        ref: "Language",
-        type: mongoose.Types.ObjectId,
-        validate: {
-          validator: function (value: string) {
-            return mongoose.Types.ObjectId.isValid(value);
+        type: {
+          language: {
+            type: String,
+            required: true,
           },
-          message: "Invalid language ID",
+          level: {
+            type: String,
+            required: true,
+          },
         },
       },
     ],

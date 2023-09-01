@@ -7,11 +7,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+import mongoose from "mongoose";
 import userSchema from "../schemas/user.schema.js";
 import workExperience from "../schemas/workExperience.schema.js";
 import { JWT } from "../utils/jwt.js";
 export default {
-    idAndUserChecker(req, res, next) {
+    postMiddleware(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const token = req.headers.token;
@@ -40,15 +41,13 @@ export default {
     idChecker(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const token = req.headers.token;
-                const userId = JWT.VERIFY(token).id;
-                let userData = yield userSchema.findById(userId);
-                if (!userData)
-                    return res.status(403).json({ message: "User not found" });
+                let id = req.params.id;
+                if (!mongoose.isValidObjectId(id))
+                    return res.status(403).json({ message: "Invalid id" });
                 return next();
             }
             catch (error) {
-                res.status(403).json({ message: "Invalid token" });
+                res.status(403).json({ message: "Invalid id" });
             }
         });
     },

@@ -1,10 +1,11 @@
 import { NextFunction, Request, Response } from "express";
+import mongoose from "mongoose";
 import userSchema from "../schemas/user.schema.js";
 import workExperience from "../schemas/workExperience.schema.js";
 import { JWT } from "../utils/jwt.js";
 
 export default {
-  async idAndUserChecker(req: Request, res: Response, next: NextFunction) {
+  async postMiddleware(req: Request, res: Response, next: NextFunction) {
     try {
       const token = req.headers.token as string;
       const userId = JWT.VERIFY(token).id;
@@ -31,13 +32,11 @@ export default {
   },
   async idChecker(req: Request, res: Response, next: NextFunction) {
     try {
-      const token = req.headers.token as string;
-      const userId = JWT.VERIFY(token).id;
-      let userData = await userSchema.findById(userId)
-      if(!userData) return res.status(403).json({ message: "User not found" });
+        let id = req.params.id
+        if(!mongoose.isValidObjectId(id)) return res.status(403).json({ message: "Invalid id" });
       return next();
     } catch (error) {
-      res.status(403).json({ message: "Invalid token" });
+      res.status(403).json({ message: "Invalid id" });
     }
   },
 };

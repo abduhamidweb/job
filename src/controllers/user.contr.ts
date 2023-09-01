@@ -12,19 +12,15 @@ import jobSchema from "../schemas/job.schema.js";
 import fs from "fs";
 import { Any } from "telegraf/typings/util.js";
 import { client } from "../db/redis.js";
+import uploader from "../utils/cloudinary.js";
 let { msg, send } = responser;
 
-// client.connect(); 
+// client.connect();
 
 export default {
   async post(req: Request, res: Response) {
-    try { 
-      let {
-        fullName,
-        userEmail: email,
-        password,
-        confirmationCode,
-      } = req.body;
+    try {
+      let { fullName, userEmail: email, password, confirmationCode } = req.body;
       if (password) {
         if (!confirmationCode) {
           const generatedConfirmationCode = await sendConfirmationEmail(email);
@@ -39,23 +35,22 @@ export default {
             400
           );
         }
-      } 
-      let pass:string = process.env.SECRET_KEY as string;
-        const user: any = new Users({
-          fullName,
-          email,
-          password: sha256(password || pass),
-        });
-        await user.save();
-        client.set(email, "");
+      }
+      let pass: string = process.env.SECRET_KEY as string;
+      const user: any = new Users({
+        fullName,
+        email,
+        password: sha256(password || pass),
+      });
+      await user.save();
+      client.set(email, "");
 
-        res.status(201).json({
-          token: JWT.SIGN({
-            id: user._id,
-          }),
-          data: user,
-        });
-     
+      res.status(201).json({
+        token: JWT.SIGN({
+          id: user._id,
+        }),
+        data: user,
+      });
     } catch (error: any) {
       err(res, error.message, 500);
     }
@@ -69,7 +64,10 @@ export default {
         .populate("roleAndSalary")
         .populate("skills")
         .populate("lang")
-        .populate("workExperience");
+        .populate({
+          path: "workExperience",
+          populate: "projects",
+        });
 
       if (!user) {
         return res.status(404).json({ message: "Users not found" });
@@ -93,7 +91,10 @@ export default {
         .populate("roleAndSalary")
         .populate("skills")
         .populate("lang")
-        .populate("workExperience");
+        .populate({
+          path: "workExperience",
+          populate: "projects",
+        });
 
       if (!user) {
         return res.status(404).json({ message: "User not found" });
@@ -111,7 +112,7 @@ export default {
       let { userEmail: email, password } = req.body;
       let user: any = await Users.findOne({
         email,
-        password: sha256(password||process.env.SECRET_KEY),
+        password: sha256(password || process.env.SECRET_KEY),
       });
       if (!user) {
         return err(res, "Email or password wrong!", 400);
@@ -134,6 +135,8 @@ export default {
 
       if (req.files && reqFiles) {
         const profilePicture: any = reqFiles.profilePicture;
+        
+        
         const allowedExtensions = [".jpg", ".jpeg", ".png"];
 
         const ext = path.extname(profilePicture.name).toLowerCase();
@@ -143,27 +146,11 @@ export default {
             .status(400)
             .json({ message: "Only JPEG and PNG image files are allowed" });
         }
+         let imgPath=await uploader( profilePicture.data,id )
+        
 
-        const fileName = id + "." + profilePicture.mimetype.split("/")[1];
-        let direction = path.join(process.cwd(), "src", "public", "images");
-        const uploadPath = path.join(direction, fileName);
-
-        fs.readdir(direction, (err, file) => {
-          if (file[0] && file[0].split(".")[0] == id) {
-            fs.unlinkSync(direction + "/" + file[0]);
-          }
-        });
-
-        setTimeout(() => {
-          profilePicture.mv(uploadPath, (err: any) => {
-            if (err) {
-              return res.status(500).json({ message: err });
-            }
-          });
-        }, 3);
-
-        await Users.findByIdAndUpdate(id, {
-          profilePicture: "/images/" + fileName,
+        await Users.findByIdAndUpdate(id, { 
+          profilePicture:imgPath,
         });
       }
 

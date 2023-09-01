@@ -53,12 +53,13 @@ export default {
                 const userId = JWT.VERIFY(token).id;
                 let user = yield userSchema
                     .findById(userId)
-                    .populate("workExperience");
+                    .populate({
+                    path: "workExperience",
+                    populate: { path: "projects" },
+                });
                 if (!user)
                     return res.status(403).json({ message: "User not found" });
                 let { workExperience } = user;
-                console.log(user);
-                console.log(workExperience);
                 res.send(workExperience);
             }
             catch (error) {
@@ -70,7 +71,9 @@ export default {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const workExperienceId = req.params.id;
-                const data = yield workExperience.findById(workExperienceId);
+                const data = yield workExperience
+                    .findById(workExperienceId)
+                    .populate("projects");
                 res.status(200).json(data);
             }
             catch (error) {
@@ -103,7 +106,7 @@ export default {
                         .json({ message: "No data provided for update." });
                 }
                 yield workExperience.findByIdAndUpdate(workExperienceId, updateData);
-                let newWE = yield workExperience.findByIdAndUpdate(workExperienceId);
+                let newWE = yield workExperience.findById(workExperienceId);
                 yield res.json(newWE);
             }
             catch (error) {
