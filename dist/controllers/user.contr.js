@@ -163,6 +163,7 @@ export default {
                     "nationality",
                     "residence",
                     "aboutyourself",
+                    "checked",
                 ];
                 const foundProperty = requiredProperties.find((property) => req.body[property]);
                 if ((Object.keys(updateData).length === 0 || !foundProperty) &&
@@ -177,6 +178,9 @@ export default {
                     if (updateData.hasOwnProperty(field)) {
                         const fieldValue = updateData[field];
                         if (fieldValue && requiredProperties.includes(field)) {
+                            existingData[field] = fieldValue;
+                        }
+                        else if (fieldValue == false && requiredProperties.includes(field)) {
                             existingData[field] = fieldValue;
                         }
                     }

@@ -134,6 +134,10 @@ const userSchema: any = new Schema({
       message: "Invalid URL",
     },
   },
+  checked: {
+    type: Boolean,
+    default:false
+  }
 });
 
 function isBoolean(value: boolean): boolean {

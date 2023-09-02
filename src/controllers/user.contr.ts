@@ -162,6 +162,7 @@ export default {
         nationality: any;
         residence: any;
         aboutyourself: any;
+        checked:any
       } = req.body;
       const requiredProperties = [
         "fullName",
@@ -172,6 +173,7 @@ export default {
         "nationality",
         "residence",
         "aboutyourself",
+        "checked",
       ];
 
       const foundProperty = requiredProperties.find(
@@ -195,6 +197,8 @@ export default {
           const fieldValue = updateData[field as keyof typeof updateData];
 
           if (fieldValue && requiredProperties.includes(field)) {
+            existingData[field] = fieldValue;
+          } else if (fieldValue == false && requiredProperties.includes(field)) {
             existingData[field] = fieldValue;
           }
         }
