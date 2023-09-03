@@ -9,6 +9,8 @@ import moneySchema from '../schemas/money.schema.js';
 import recRuiterSchema from '../schemas/recruiter.schema.js';
 import JobCategoryModel from '../schemas/jobCategory.schema.js';
 import IMoneyType, { ComLocationData, FileData, IFileData, IJobCategory } from '../interface/interface';
+import userSchema from '../schemas/user.schema.js';
+import { Types } from 'mongoose';
 class FileDataController {
     async updateFileData(req: Request, res: Response) {
         const fileId = req.params.id;
@@ -228,6 +230,50 @@ class FileDataController {
                 const fileDataList = await FileDataModel.find().populate('jobSkills jobEmployee moneyTypeId catId');
                 return res.status(200).json(fileDataList);
             }
+        } catch (error: any) {
+            console.error(error.message);
+            return res.status(500).json({ message: error.message, status: 500 });
+        }
+    }
+    async getApplyUser(req: Request, res: Response) {
+        const token = req.headers.token as string;
+
+        try {
+            if (token) {
+                let userId = JWT.VERIFY(token).id;
+                let jobsWithUserId = [];
+                const alljobs = await FileDataModel.find().populate("employees moreInfo jobSkills moneyTypeId");
+                // userId ni tekshirib, joblarni olib beramiz:
+                const userIdObjectID = new Types.ObjectId(userId);
+
+                // Filter jobs by matching userId in employees array
+                for (let job of alljobs) {
+                    if (job.employees.some(employeeId => employeeId.equals(userIdObjectID))) {
+                        jobsWithUserId.push(job);
+                    }
+                }
+                return res.status(200).json(jobsWithUserId);
+                
+                // Print the result
+             
+                
+                // console.log('jobsWithUserId :', jobsWithUserId);
+
+                // res.send(jobsWithUserId)
+                // const recruiter = await recRuiterSchema.find()
+                //     .populate({
+                //         path: 'posts',
+                //         populate: [
+                //             { path: 'employees', model: userSchema },
+                //         ],
+                //     }).exec();
+                // console.log('recruiter :', recruiter);
+                // if (!recruiter) {
+                //     return res.status(404).json({ message: 'Recruiter not found', status: 404 });
+                // }
+                // return res.status(200).json(recruiter);
+            }
+
         } catch (error: any) {
             console.error(error.message);
             return res.status(500).json({ message: error.message, status: 500 });

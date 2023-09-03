@@ -3,6 +3,7 @@ import job from "../controllers/job.contr.js";
 import authMiddleware from "../middleware/auth.js";
 const router: Router = Router();
 router.get('/', job.getAllFileData);
+router.get('/applied', job.getApplyUser);
 router.get('/location', job.getComLocations)
 router.get('/search', job.searchByCriteria)
 router.get('/:id', job.getFileDataById);
