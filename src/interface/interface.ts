@@ -24,7 +24,7 @@ export interface IRecruiter extends Document {
 }
 export interface IFileData extends Document {
     comImg: string;
-    employeies: Types.ObjectId[];
+    employees: Types.ObjectId[];
     comName: string;
     comLocation?: string;
     jobSave: boolean;

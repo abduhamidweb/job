@@ -132,7 +132,7 @@ class RecruiterController {
                 .populate({
                     path: 'posts',
                     populate: [
-                        { path: 'employeies', model: userSchema },
+                        { path: 'employees', model: userSchema },
                         { path: 'jobSkills', model: Skill },
                         { path: 'catId', model: JobCategoryModel },
                         { path: 'moreInfo', model: moreinfo },
@@ -149,14 +149,14 @@ class RecruiterController {
         }
     }
     async getRecruiterByToken(req: Request, res: Response) {
-        try { 
+        try {
             let token = req.query.token as string;
             let userId = JWT.VERIFY(token as string).id
             const recruiter = await RecruiterModel.findById(userId)
                 .populate({
                     path: 'posts',
                     populate: [
-                        { path: 'employeies', model: userSchema },
+                        { path: 'employees', model: userSchema },
                         { path: 'jobSkills', model: Skill },
                         { path: 'catId', model: JobCategoryModel },
                         { path: 'moreInfo', model: moreinfo },
@@ -183,7 +183,7 @@ class RecruiterController {
                         path: 'posts',
                         populate: [
                             { path: 'jobSkills', model: Skill },
-                            { path: 'employeies', model: userSchema },
+                            { path: 'employees', model: userSchema },
                             { path: 'catId', model: JobCategoryModel },
                             { path: 'moreInfo', model: moreinfo },
                             { path: 'moneyTypeId', model: moneySchema }
@@ -201,7 +201,7 @@ class RecruiterController {
                         path: 'posts',
                         populate: [
                             { path: 'jobSkills', model: Skill },
-                            { path: 'employeies', model: userSchema },
+                            { path: 'employees', model: userSchema },
                             { path: 'catId', model: JobCategoryModel },
                             { path: 'moreInfo', model: moreinfo },
                             { path: 'moneyTypeId', model: moneySchema }

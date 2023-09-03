@@ -135,8 +135,8 @@ export default {
 
       if (req.files && reqFiles) {
         const profilePicture: any = reqFiles.profilePicture;
-        
-        
+
+
         const allowedExtensions = [".jpg", ".jpeg", ".png"];
 
         const ext = path.extname(profilePicture.name).toLowerCase();
@@ -146,11 +146,11 @@ export default {
             .status(400)
             .json({ message: "Only JPEG and PNG image files are allowed" });
         }
-         let imgPath=await uploader( profilePicture.data,id )
-        
+        let imgPath = await uploader(profilePicture.data, id)
 
-        await Users.findByIdAndUpdate(id, { 
-          profilePicture:imgPath,
+
+        await Users.findByIdAndUpdate(id, {
+          profilePicture: imgPath,
         });
       }
 
@@ -162,7 +162,7 @@ export default {
         nationality: any;
         residence: any;
         aboutyourself: any;
-        checked:any
+        checked: any
       } = req.body;
       const requiredProperties = [
         "fullName",
@@ -237,11 +237,11 @@ export default {
       }
       let updatedJob = await jobSchema.findByIdAndUpdate(jobId, {
         $push: {
-          employeies: userId,
+          employees: userId,
         },
       });
 
-      if (!updatedJob){
+      if (!updatedJob) {
         return res.status(404).json({ message: "Job not found", status: 404 });
       }
 

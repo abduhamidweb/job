@@ -3,7 +3,7 @@ import validator from 'validator';
 import { IFileData } from '../interface/interface';
 
 const FileDataSchema = new Schema<IFileData>({
-    employeies: [
+    employees: [
         {
             type: Schema.Types.ObjectId,
             ref: "Users"
@@ -35,12 +35,12 @@ const FileDataSchema = new Schema<IFileData>({
         type: String,
         required: true,
     },
-    jobSkills: 
-        {
-            type: Schema.Types.ObjectId,
-            ref: 'Skills',
-        },
-   
+    jobSkills:
+    {
+        type: Schema.Types.ObjectId,
+        ref: 'Skills',
+    },
+
     jobType: {
         type: String,
         required: true,
@@ -69,7 +69,7 @@ const FileDataSchema = new Schema<IFileData>({
         type: Schema.Types.ObjectId,
         ref: 'TypeOfMoney', // "TypeOfMoney" nomli boshqa modelga bog'lanish uchun ref
     },
-},{ timestamps: true });
+}, { timestamps: true });
 // Model yaratish
 const FileDataModel = model<IFileData>('FileData', FileDataSchema);
 

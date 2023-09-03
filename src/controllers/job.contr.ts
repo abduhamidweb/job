@@ -238,7 +238,7 @@ class FileDataController {
         const fileId = req.params.id;
         try {
             const fileData = await FileDataModel.findById(fileId)
-                .populate('jobSkills jobEmployee moreInfo moneyTypeId catId employeies')
+                .populate('jobSkills jobEmployee moreInfo moneyTypeId catId employees')
             if (!fileData) {
                 return res.status(404).json({ message: 'FileData topilmadi', status: 404 });
             }
@@ -253,7 +253,7 @@ class FileDataController {
             const token = req.headers.token as string;
             let fileId = JWT.VERIFY(token).id;
             const fileData = await FileDataModel.findById(fileId)
-                .populate('jobSkills jobEmployee moreInfo moneyTypeId catId employeies')
+                .populate('jobSkills jobEmployee moreInfo moneyTypeId catId employees')
             if (!fileData) {
                 return res.status(404).json({ message: 'FileData topilmadi', status: 404 });
             }
