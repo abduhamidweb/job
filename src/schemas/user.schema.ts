@@ -46,8 +46,6 @@ const userSchema: any = new Schema({
   },
   aboutyourself: {
     type: String,
-    maxlength: 50,
-    required: false,
   },
   experience: {
     ref: "Experience",
